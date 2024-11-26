@@ -9,7 +9,7 @@ const divide = (x: number, y: number): E.Either<string, number> => {
 
 Deno.test("Either", () => {
   const op = compose(
-    E.map((x: number) => x + 1),
+    E.rmap((x: number) => x + 1),
     E.bind((x: number) => divide(x, 2)),
     E.bind((x: number) => divide(x, 2))
   );

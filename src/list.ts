@@ -5,10 +5,4 @@ export const map =
   (list: A[]): B[] =>
     list.map(fn);
 
-export function list<A>(value: A[]): Functor<A> {
-  return {
-    map: <B>(f: (a: A) => B) => list(map(f)(value)),
-  };
-}
-
-export type ListFunctor<A> = ReturnType<typeof list<A>>;
+export const L = { map } satisfies Functor<"Array">;

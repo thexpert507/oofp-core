@@ -1,70 +1,36 @@
-import { compose } from "./compose.ts";
-import * as E from "./either.ts";
 import * as M from "./maybe.ts";
+import { Fn } from "./function.ts";
+import { Functor } from "./functor.ts";
+import { Kind, URIS } from "./URIS.ts";
+import { Kind2, URIS2 } from "./URIS2.ts";
+import { BiFunctor } from "./bi-functor.ts";
 
-type MaybeT<A = unknown> =
-  | { tag: "Promise"; monad: Promise<M.Maybe<A>> }
-  | { tag: "Either"; monad: E.Either<unknown, M.Maybe<A>> }
-  | { tag: "Maybe"; monad: M.Maybe<A> };
+export interface MaybeT<F extends URIS> {
+  of: <A>(a: Kind<F, A>) => M.Maybe<Kind<F, A>>;
+  map: <A, B>(f: Fn<A, B>) => (as: M.Maybe<Kind<F, A>>) => M.Maybe<Kind<F, B>>;
+}
 
-type MReturn<M extends MaybeT, A> = M extends { tag: "Promise" }
-  ? Promise<M.Maybe<A>>
-  : M extends { tag: "Either" }
-  ? E.Either<unknown, M.Maybe<A>>
-  : M.Maybe<A>;
+export interface BiMaybeT<F extends URIS2> {
+  of: <A, B>(a: Kind2<F, A, B>) => M.Maybe<Kind2<F, A, B>>;
+  bimap: <A, B, C, D>(
+    f: Fn<A, B>,
+    g: Fn<C, D>
+  ) => (as: M.Maybe<Kind2<F, A, C>>) => M.Maybe<Kind2<F, B, D>>;
+}
 
-type Monads = MaybeT["tag"];
-type MValues<M extends Monads, A> = M extends "Promise"
-  ? Promise<M.Maybe<A>>
-  : M extends "Either"
-  ? E.Either<unknown, M.Maybe<A>>
-  : M.Maybe<A>;
+const base = <F extends URIS>(functor: Functor<F>): MaybeT<F> => ({
+  of: <A>(a: Kind<F, A>) => M.of(a),
+  map: <A, B>(f: Fn<A, B>) => M.map(functor.map(f)),
+});
 
-export const identity = <A>(value: MaybeT<A>): MaybeT<A> => value;
+const base2 = <F extends URIS2>(functor: BiFunctor<F>): BiMaybeT<F> => ({
+  of: <A, B>(a: Kind2<F, A, B>) => M.of(a),
+  bimap: <A, B, C, D>(f: Fn<A, B>, g: Fn<C, D>) => M.map(functor.bimap(f, g)),
+});
 
-export const of =
-  <M extends Monads>(tag: M) =>
-  <A>(value: A): MaybeT<A> => {
-    if (tag === "Promise") return { tag, monad: Promise.resolve(M.just(value)) };
-    if (tag === "Either") return { tag, monad: E.right(M.just(value)) };
-    return { tag, monad: M.just(value) };
-  };
-
-export const from =
-  <M extends Monads>(tag: M) =>
-  <A>(value: MValues<M, A>): MaybeT<A> => {
-    if (tag === "Promise") return { tag, monad: value as Promise<M.Maybe<A>> };
-    if (tag === "Either") return { tag, monad: value as E.Either<unknown, M.Maybe<A>> };
-    return { tag, monad: value as M.Maybe<A> };
-  };
-
-export const map =
-  <A, B>(fn: (value: A) => B) =>
-  ({ tag, monad }: MaybeT<A>): MaybeT<B> => {
-    if (tag === "Promise") return { tag, monad: monad.then(M.map(fn)) };
-    if (tag === "Either") return { tag, monad: E.map(M.map(fn))(monad) };
-    return { tag, monad: M.map(fn)(monad) };
-  };
-
-export const bind =
-  <A, B>(fn: (value: A) => MaybeT<B>) =>
-  ({ tag, monad }: MaybeT<A>): MaybeT<B> => {
-    if (tag === "Promise") return { tag, monad: monad.then(M.bind(fn)) as Promise<M.Maybe<B>> };
-    if (tag === "Either") {
-      return { tag, monad: E.map(M.bind(fn))(monad) as E.Either<unknown, M.Maybe<B>> };
-    }
-    return { tag, monad: M.bind(fn)(monad) as M.Maybe<B> };
-  };
-
-export const getOrElse =
-  <A>(defaultValue: A) =>
-  <M extends MaybeT<A>>({ tag, monad }: M): A | Promise<A> => {
-    if (tag === "Promise") return monad.then(M.getOrElse(defaultValue));
-    if (tag === "Either")
-      return compose(
-        M.getOrElse(defaultValue),
-        E.getOrElse(M.just(defaultValue)),
-        E.identity<unknown, M.Maybe<A>>
-      )(monad);
-    return M.getOrElse(defaultValue)(monad);
-  };
+export function maybeT<F extends URIS>(functor: Functor<F>): MaybeT<F>;
+export function maybeT<F extends URIS2>(functor: BiFunctor<F>): BiMaybeT<F>;
+// deno-lint-ignore no-explicit-any
+export function maybeT(functor: any) {
+  return "bimap" in functor ? base2(functor) : base(functor);
+}

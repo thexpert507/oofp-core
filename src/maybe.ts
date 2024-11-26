@@ -1,3 +1,5 @@
+import { Functor } from "./functor.ts";
+
 export type Maybe<T = unknown> = T | null | undefined;
 
 export const of = <T>(value: T): Maybe<T> => value;
@@ -50,3 +52,9 @@ export const getOrElse =
   <T>(defaultValue: T) =>
   (value: Maybe<T>): T =>
     isNothing(value) ? defaultValue : value;
+
+export type Monad = "Maybe";
+
+interface MF extends Functor<Monad> {}
+
+export const M: MF = { map };

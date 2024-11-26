@@ -6,6 +6,6 @@ interface URItoKind<A> {
   Maybe: Maybe<A>;
 }
 
-type URIS = keyof URItoKind<unknown>;
+export type URIS = keyof URItoKind<unknown>;
 
 export type Kind<F extends URIS, A> = URItoKind<A>[F];
