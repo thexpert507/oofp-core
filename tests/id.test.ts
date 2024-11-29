@@ -1,7 +1,29 @@
-import { assert } from "@std/assert";
-import { id } from "../src/id.ts";
+import { describe, it, expect } from "vitest";
+import { id } from "../lib/id";
 
-Deno.test("ID", () => {
-  const value = 1;
-  assert(value === id(value));
+describe("ID function", () => {
+  it("should return the same number", () => {
+    const value = 1;
+    expect(id(value)).toBe(value);
+  });
+
+  it("should return the same string", () => {
+    const value = "test";
+    expect(id(value)).toBe(value);
+  });
+
+  it("should return the same object", () => {
+    const value = { key: "value" };
+    expect(id(value)).toBe(value);
+  });
+
+  it("should return the same array", () => {
+    const value = [1, 2, 3];
+    expect(id(value)).toBe(value);
+  });
+
+  it("should return the same boolean", () => {
+    const value = true;
+    expect(id(value)).toBe(value);
+  });
 });

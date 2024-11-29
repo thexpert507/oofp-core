@@ -1,39 +1,59 @@
-import { assert } from "@std/assert";
-import { compose } from "../src/compose.ts";
-import * as M from "../src/maybe.ts";
-import * as E from "../src/either.ts";
-import * as L from "../src/list.ts";
+import { describe, it, expect } from "vitest";
+import { compose } from "../lib/compose.ts";
+import * as M from "../lib/maybe.ts";
+import * as E from "../lib/either.ts";
+import * as L from "../lib/list.ts";
 
-Deno.test("Compose: equals types", () => {
-  const f1 = (x: number) => x + 1;
-  const f2 = (x: number) => x * 2;
-  const composed = compose(f1, f2);
-  assert(composed(1) === 3);
-});
+describe("Compose", () => {
+  it("equals types", () => {
+    const f1 = (x: number) => x + 1;
+    const f2 = (x: number) => x * 2;
+    const composed = compose(f1, f2);
+    expect(composed(1)).toBe(3);
+  });
 
-Deno.test("Compose: different types", () => {
-  const f1 = (x: number) => x + 1;
-  const f2 = (x: string) => x.length;
-  const composed = compose(f1, f2);
-  assert(composed("1") === 2);
-});
+  it("different types", () => {
+    const f1 = (x: number) => x + 1;
+    const f2 = (x: string) => x.length;
+    const composed = compose(f1, f2);
+    expect(composed("1")).toBe(2);
+  });
 
-Deno.test("Compose: 3 functions", () => {
-  const composed = compose(M.getOrElse(0), E.getOrElse(M.just(0)), E.identity<never, number>);
-  const result = composed(E.right(10));
-  assert(result === 10);
-});
+  it("3 functions", () => {
+    const composed = compose(M.getOrElse(0), E.getOrElse(M.just(0)), E.identity<never, number>);
+    const result = composed(E.right(10));
+    expect(result).toBe(10);
+  });
 
-type Fn<A, B> = (value: A) => B;
+  it("Functors", () => {
+    const square = (x: number) => x * x;
+    const mis = M.just([1, 2, 3]);
+    const map = compose(M.map, L.map<number, number>);
+    const mis2 = map(square)(mis);
+    expect(M.getOrElse<number[]>([])(mis2).join(",")).toBe("1,4,9");
+  });
 
-Deno.test("Compose: Functors", () => {
-  const square = (x: number) => x * x;
+  it("Compose: nested functions", () => {
+    const f1 = (x: number) => x + 1;
+    const f2 = (x: number) => x * 2;
+    const f3 = (x: number) => x - 3;
+    const composed = compose(f1, f2, f3);
+    expect(composed(5)).toBe(5);
+  });
 
-  const mis = M.just([1, 2, 3]);
+  it("Compose: with Maybe", () => {
+    const f1 = (x: number) => x + 1;
+    const f2 = (x: number) => x * 2;
+    const composed = compose(M.map(f1), M.map(f2));
+    const result = composed(M.just(2));
+    expect(M.getOrElse(0)(result)).toBe(5);
+  });
 
-  const map = compose(M.map, L.map<number, number>);
-
-  const mis2 = map(square)(mis);
-
-  assert(M.getOrElse<number[]>([])(mis2).join(",") === "1,4,9");
+  it("Compose: with Either", () => {
+    const f1 = (x: number) => x + 1;
+    const f2 = (x: number) => x * 2;
+    const composed = compose(E.map(f1), E.map(f2), E.identity<never, number>);
+    const result = composed(E.right(2));
+    expect(E.getOrElse(0)(result)).toBe(5);
+  });
 });

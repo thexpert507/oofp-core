@@ -1,24 +1,71 @@
-import * as E from "../src/either.ts";
-import * as P from "../src/promise.ts";
-import * as M from "../src/maybe.ts";
-import { bicompose } from "../src/bi-compose.ts";
-import { compose } from "../src/compose.ts";
-import { id } from "../src/id.ts";
-import { assert } from "@std/assert";
+import { describe, it, expect } from "vitest";
+import * as E from "../lib/either.ts";
+import * as P from "../lib/promise.ts";
+import * as M from "../lib/maybe.ts";
+import { bicompose } from "../lib/bi-compose.ts";
+import { compose } from "../lib/compose.ts";
+import { id } from "../lib/id.ts";
 
-Deno.test("bi-compose", () => {
-  const BI = bicompose<E.Monad, P.Monad, M.Monad>(E, P, M);
+describe("bi-compose", () => {
+  const BI = bicompose<E.URI, P.URI, M.URI>(E, P, M);
 
+  const toUpper = (s: string) => s.toUpperCase();
   const length = (a: number[]) => `${a.length} items`;
   const double = (b: number) => b * 2;
 
-  const composed = compose(
-    BI.bimap(length, double),
-    id<E.Either<Promise<number[]>, M.Maybe<number>>>
-  );
+  it("should handle left side composition", async () => {
+    const composed = compose(
+      BI.bimap(toUpper, double),
+      BI.bimap(length, id),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+    );
 
-  const result = composed(E.left(Promise.resolve([1])));
+    const result = composed(E.left(Promise.resolve([1])));
 
-  assert(result.tag === "Left");
-  assert(result.value instanceof Promise);
+    expect(result.tag).toBe("Left");
+    expect(result.value).toBeInstanceOf(Promise);
+    const resolvedValue = await result.value;
+    expect(resolvedValue).toBe("1 items");
+  });
+
+  it("should handle right side composition", () => {
+    const composed = compose(
+      BI.bimap(toUpper, double),
+      BI.bimap(length, id),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+    );
+
+    const result = composed(E.right(M.just(2)));
+
+    expect(result.tag).toBe("Right");
+    expect(result.value).toEqual(M.just(4));
+  });
+
+  it("should handle nested composition", async () => {
+    const composed = compose(
+      BI.bimap(toUpper, double),
+      BI.bimap(length, id),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+    );
+
+    const result = composed(E.left(Promise.resolve([1, 2, 3])));
+
+    expect(result.tag).toBe("Left");
+    expect(result.value).toBeInstanceOf(Promise);
+    const resolvedValue = await result.value;
+    expect(resolvedValue).toBe("3 items");
+  });
+
+  it("should handle empty maybe", () => {
+    const composed = compose(
+      BI.bimap(toUpper, double),
+      BI.bimap(length, id),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+    );
+
+    const result = composed(E.right(M.nothing()));
+
+    expect(result.tag).toBe("Right");
+    expect(result.value).toEqual(M.nothing());
+  });
 });

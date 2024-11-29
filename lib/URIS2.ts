@@ -1,7 +1,6 @@
 import { Either } from "./either.ts";
 
-interface URItoKind2<A, B> {
-  Map: Map<A, B>;
+export interface URItoKind2<A, B> {
   Either: Either<A, B>;
 }
 

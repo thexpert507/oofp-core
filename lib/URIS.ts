@@ -1,6 +1,6 @@
 import { Maybe } from "./maybe.ts";
 
-interface URItoKind<A> {
+export interface URItoKind<A> {
   Array: Array<A>;
   Promise: Promise<A>;
   Maybe: Maybe<A>;

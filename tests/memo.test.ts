@@ -1,33 +1,49 @@
-import { assert } from "@std/assert";
+import { describe, it, expect } from "vitest";
 import { randomInt } from "node:crypto";
-import { memo } from "../src/memo.ts";
+import { memo } from "../lib/memo.ts";
 
 const factorial = (n: number): number => {
   if (n === 0) return 1;
   return n * factorial(n - 1);
 };
 
-Deno.test("Memo: factorial", () => {
-  const facMemo = memo(factorial);
+describe("Memo", () => {
+  it("should memoize factorial function", () => {
+    const facMemo = memo(factorial);
 
-  console.time("Memo: factorial");
-  assert(facMemo(10) === 3628800);
-  console.timeEnd("Memo: factorial");
+    console.time("Memo: factorial");
+    expect(facMemo(10)).toBe(3628800);
+    console.timeEnd("Memo: factorial");
 
-  console.time("Memo: factorial");
-  assert(facMemo(10) === 3628800);
-  console.timeEnd("Memo: factorial");
-});
+    console.time("Memo: factorial");
+    expect(facMemo(10)).toBe(3628800);
+    console.timeEnd("Memo: factorial");
+  });
 
-Deno.test("Memo: random", () => {
-  const random = () => randomInt(100);
-  const mrandom = memo(random);
+  it("should memoize random function", () => {
+    const random = () => randomInt(100);
+    const mrandom = memo(random);
 
-  console.time("Memo: random");
-  assert(mrandom(undefined) === mrandom(undefined));
-  console.timeEnd("Memo: random");
+    console.time("Memo: random");
+    expect(mrandom(undefined)).toBe(mrandom(undefined));
+    console.timeEnd("Memo: random");
+  });
 
-  console.time("Memo: random");
-  assert(mrandom(undefined) === mrandom(undefined));
-  console.timeEnd("Memo: random");
+  it("should handle different arguments", () => {
+    const add = (a: number, b: number) => a + b;
+    const memoAdd = memo((args: [number, number]) => add(args[0], args[1]));
+
+    expect(memoAdd([1, 2])).toBe(3);
+    expect(memoAdd([1, 2])).toBe(3);
+    expect(memoAdd([2, 3])).toBe(5);
+  });
+
+  it("should handle non-primitive arguments", () => {
+    const stringify = (obj: object) => JSON.stringify(obj);
+    const memoStringify = memo(stringify);
+
+    const obj = { a: 1, b: 2 };
+    expect(memoStringify(obj)).toBe(JSON.stringify(obj));
+    expect(memoStringify(obj)).toBe(JSON.stringify(obj));
+  });
 });

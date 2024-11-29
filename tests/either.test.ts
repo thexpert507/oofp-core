@@ -1,19 +1,53 @@
-import { assert } from "@std/assert";
-import { compose } from "../src/compose.ts";
-import * as E from "../src/either.ts";
+import { describe, it, expect } from "vitest";
+import { compose } from "../lib/compose";
+import * as E from "../lib/either";
 
 const divide = (x: number, y: number): E.Either<string, number> => {
   if (y === 0) return E.left("Division by zero");
   return E.right(x / y);
 };
 
-Deno.test("Either", () => {
-  const op = compose(
-    E.rmap((x: number) => x + 1),
-    E.bind((x: number) => divide(x, 2)),
-    E.bind((x: number) => divide(x, 2))
-  );
+describe("Either", () => {
+  it("should return 3.5 for valid division operations", () => {
+    const op = compose(
+      E.rmap((x: number) => x + 1),
+      E.chain((x: number) => divide(x, 2)),
+      E.chain((x: number) => divide(x, 2))
+    );
 
-  const result = op(E.right(10));
-  assert(result.value === 3.5);
+    const result = op(E.right(10));
+    expect(result.value).toBe(3.5);
+  });
+
+  it("should return 'Division by zero' for division by zero", () => {
+    const op = compose(
+      E.rmap((x: number) => x + 1),
+      E.chain((x: number) => divide(x, 0)),
+      E.chain((x: number) => divide(x, 2))
+    );
+
+    const result = op(E.right(10));
+    expect(result.value).toBe("Division by zero");
+  });
+
+  it("should handle left value correctly", () => {
+    const op = compose(
+      E.rmap((x: number) => x + 1),
+      E.chain((x: number) => divide(x, 2)),
+      E.chain((x: number) => divide(x, 2))
+    );
+
+    const result = op(E.left("Initial error"));
+    expect(result.value).toBe("Initial error");
+  });
+
+  it("should return 2.5 for valid division operations", () => {
+    const op = compose(
+      E.rmap((x: number) => x + 1),
+      E.chain((x: number) => divide(x, 2))
+    );
+
+    const result = op(E.right(4));
+    expect(result.value).toBe(2.5);
+  });
 });

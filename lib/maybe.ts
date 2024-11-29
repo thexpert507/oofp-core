@@ -1,11 +1,16 @@
-import { Functor } from "./functor.ts";
+import { Monad } from "./monad.ts";
 
-export type Maybe<T = unknown> = T | null | undefined;
+export const URI = "Maybe";
+export type URI = typeof URI;
+
+export type Maybe<T = never> = T | null | undefined;
 
 export const of = <T>(value: T): Maybe<T> => value;
 
 export const just = <T>(value: T): Maybe<T> => value;
 export const nothing = <T>(): Maybe<T> => null;
+
+export const extract = <T>(value: Maybe<T>): T => value as T;
 
 export const isNothing = <T>(value: Maybe<T>): value is null | undefined =>
   value === null || value === undefined;
@@ -19,10 +24,12 @@ export const map =
   (value: Maybe<T>): Maybe<U> =>
     isNothing(value) ? null : fn(value);
 
-export const bind =
+export const chain =
   <T, U>(fn: (value: T) => Maybe<U>) =>
   (value: Maybe<T>): Maybe<U> =>
     isNothing(value) ? null : fn(value);
+
+export const join = <T>(value: Maybe<Maybe<T>>): Maybe<T> => (isNothing(value) ? null : value);
 
 export const bindNothing =
   <T, U>(fn: () => Maybe<U>) =>
@@ -53,8 +60,6 @@ export const getOrElse =
   (value: Maybe<T>): T =>
     isNothing(value) ? defaultValue : value;
 
-export type Monad = "Maybe";
+interface MF extends Monad<URI> {}
 
-interface MF extends Functor<Monad> {}
-
-export const M: MF = { map };
+export const M: MF = { URI, map, chain, of, join };

@@ -1,18 +1,40 @@
-import { profunctor } from "../src/profunctor.ts";
+import { describe, it, expect } from "vitest";
+import { profunctor } from "../lib/profunctor.ts";
 
-Deno.test("Profunctor", () => {
-  const log = (msg: string) => console.log(msg);
+describe("Profunctor", () => {
+  it("should log the original message", () => {
+    const log = (msg: string) => msg;
+    const logger = profunctor(log);
+    expect(logger.call("Hello, World!")).toBe("Hello, World!");
+  });
 
-  const logger = profunctor(log);
+  it("should log the message in uppercase", () => {
+    const log = (msg: string) => msg;
+    const logger = profunctor(log);
+    const upperLogger = logger.lmap((msg: string) => msg.toUpperCase());
+    expect(upperLogger.call("Hello, World!")).toBe("HELLO, WORLD!");
+  });
 
-  const upperLogger = logger.lmap((msg: string) => msg.toUpperCase());
+  it("should log the numbers as a comma-separated string", () => {
+    const log = (msg: string) => msg;
+    const logger = profunctor(log);
+    const numberLogger = logger.lmap((numbers: number[]) => numbers.join(", "));
+    expect(numberLogger.call([1, 2, 3])).toBe("1, 2, 3");
+  });
 
-  const numberLogger = logger.lmap((numbers: number[]) => numbers.join(", "));
+  it("should prepend 'Double: ' to the message", () => {
+    const log = (msg: string) => msg;
+    const logger = profunctor(log);
+    const doubleLogger = logger.rmap((msg: string) => `Double: ${msg}`);
+    expect(doubleLogger.call("Hello, World!")).toBe("Double: Hello, World!");
+  });
 
-  const doubleLogger = logger.rmap(() => "Double: ");
-
-  logger.call("Hello, World!");
-  upperLogger.call("Hello, World!");
-  numberLogger.call([1, 2, 3]);
-  doubleLogger.call("Hello, World!");
+  it("should compose lmap and rmap correctly", () => {
+    const log = (msg: string) => msg;
+    const logger = profunctor(log);
+    const composedLogger = logger
+      .lmap((msg: string) => msg.toUpperCase())
+      .rmap((msg: string) => `Composed: ${msg}`);
+    expect(composedLogger.call("Hello, World!")).toBe("Composed: HELLO, WORLD!");
+  });
 });
