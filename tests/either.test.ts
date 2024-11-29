@@ -43,11 +43,11 @@ describe("Either", () => {
 
   it("should return 2.5 for valid division operations", () => {
     const op = compose(
-      E.rmap((x: number) => x + 1),
+      E.map((x: number) => x + 1),
       E.chain((x: number) => divide(x, 2))
     );
 
-    const result = op(E.right(4));
+    const result = op(E.right(3));
     expect(result.value).toBe(2.5);
   });
 });

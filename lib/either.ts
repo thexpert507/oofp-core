@@ -1,3 +1,5 @@
+import type { Maybe } from "./maybe.ts";
+import * as M from "./maybe.ts";
 import { Fn } from "./function.ts";
 import { Monad2 } from "./monad-2.ts";
 
@@ -18,6 +20,11 @@ export const map =
   <A, B>(fn: Fn<A, B>) =>
   <E>(either: Either<E, A>): Either<E, B> =>
     either.tag === "Right" ? right(fn(either.value)) : (either as Either);
+
+export const mapLeft =
+  <E, E2>(fn: Fn<E, E2>) =>
+  <A>(either: Either<E, A>): Either<E2, A> =>
+    either.tag === "Left" ? left(fn(either.value)) : (either as Right<A>);
 
 export const bimap =
   <E, A, E2, B>(fn: Fn<E, E2>, gn: Fn<A, B>) =>
@@ -64,9 +71,9 @@ export const tapLeft =
   };
 
 export const getOrElse =
-  <A>(defaultValue: A) =>
-  <E>(either: Either<E, A>): A =>
-    either.tag === "Right" ? either.value : defaultValue;
+  <E, A>(f: Fn<E, A>) =>
+  (either: Either<E, A>): A =>
+    either.tag === "Right" ? either.value : f(either.value);
 
 export const getLeftOrElse =
   <E>(defaultValue: E) =>
@@ -77,6 +84,15 @@ export const fold =
   <E, A, T>(onLeft: (value: E) => T, onRight: (value: A) => T) =>
   (either: Either<E, A>): T =>
     either.tag === "Left" ? onLeft(either.value) : onRight(either.value);
+
+export const toUnion = <E, A>(either: Either<E, A>): E | A =>
+  either.tag === "Left" ? either.value : either.value;
+
+export const toNullable = <E, A>(either: Either<E, A>): A | null =>
+  either.tag === "Right" ? either.value : null;
+
+export const toMaybe = <E, A>(either: Either<E, A>): Maybe<A> =>
+  either.tag === "Right" ? M.just(either.value) : M.nothing();
 
 interface EF extends Monad2<URI> {}
 

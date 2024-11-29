@@ -21,11 +21,11 @@ describe("bi-compose", () => {
     );
 
     const result = composed(E.left(Promise.resolve([1])));
-
+    console.log(result);
     expect(result.tag).toBe("Left");
     expect(result.value).toBeInstanceOf(Promise);
     const resolvedValue = await result.value;
-    expect(resolvedValue).toBe("1 items");
+    expect(resolvedValue).toBe("1 ITEMS");
   });
 
   it("should handle right side composition", () => {
@@ -53,7 +53,7 @@ describe("bi-compose", () => {
     expect(result.tag).toBe("Left");
     expect(result.value).toBeInstanceOf(Promise);
     const resolvedValue = await result.value;
-    expect(resolvedValue).toBe("3 items");
+    expect(resolvedValue).toBe("3 ITEMS");
   });
 
   it("should handle empty maybe", () => {

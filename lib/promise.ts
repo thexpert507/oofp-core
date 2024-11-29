@@ -5,6 +5,14 @@ export type URI = typeof URI;
 
 export const of = <A>(value: A): Promise<A> => Promise.resolve(value);
 
+export const tap =
+  <A>(f: (a: A) => void) =>
+  (value: Promise<A>): Promise<A> =>
+    value.then((value) => {
+      f(value);
+      return value;
+    });
+
 export const join = <A>(value: Promise<Promise<A>>): Promise<A> => value.then((value) => value);
 
 export const map =

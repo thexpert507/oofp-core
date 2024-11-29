@@ -4,10 +4,6 @@ import { Functor } from "./functor.ts";
 import { Kind, URIS } from "./URIS.ts";
 import { Kind2, URIS2 } from "./URIS2.ts";
 
-// export interface BiCompose<A, B> {
-//   bimap<C, D>(f1: Fn<A, C>, f2: Fn<B, D>): BiCompose<C, D>;
-// }
-
 export type Bicompose<F extends URIS2, FA extends URIS, FB extends URIS> = {
   bimap: <A, B, C, D>(
     f: Fn<A, C>,
