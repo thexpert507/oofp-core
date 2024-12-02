@@ -5,7 +5,7 @@ export type URI = typeof URI;
 
 export type Maybe<T = never> = T | null | undefined;
 
-export const of = <T>(value: T): Maybe<T> => value;
+export const of = <T>(value: T | null | undefined): Maybe<T> => value;
 
 export const just = <T>(value: T): Maybe<T> => value;
 export const nothing = <T>(): Maybe<T> => null;

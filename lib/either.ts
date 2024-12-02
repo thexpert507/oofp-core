@@ -14,6 +14,12 @@ export const left = <E, A>(value: E): Either<E, A> => ({ tag: "Left", value });
 export const right = <E, A>(value: A): Either<E, A> => ({ tag: "Right", value });
 export const of = right;
 
+export const fromNullable =
+  <E>(onNone: E) =>
+  <A>(value: A | null | undefined): Either<E, A> => {
+    return value === null && value === undefined ? left(onNone) : right(value as A);
+  };
+
 export const identity = <E, A>(value: Either<E, A>): Either<E, A> => value;
 
 export const map =
@@ -93,6 +99,20 @@ export const toNullable = <E, A>(either: Either<E, A>): A | null =>
 
 export const toMaybe = <E, A>(either: Either<E, A>): Maybe<A> =>
   either.tag === "Right" ? M.just(either.value) : M.nothing();
+
+export const apply =
+  <E, A, B>(fab: Either<E, Fn<A, B>>) =>
+  (fa: Either<E, A>): Either<E, B> => {
+    return fa.tag === "Right" && fab.tag === "Right" ? right(fab.value(fa.value)) : (fa as Left<E>);
+  };
+
+export const applyw =
+  <E, A, B>(fab: Either<E, Fn<A, B>>) =>
+  <E2>(fa: Either<E2, A>): Either<E | E2, B> => {
+    return fa.tag === "Right" && fab.tag === "Right"
+      ? right(fab.value(fa.value))
+      : (fa as Left<E | E2>);
+  };
 
 interface EF extends Monad2<URI> {}
 

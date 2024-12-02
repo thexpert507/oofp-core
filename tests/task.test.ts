@@ -35,4 +35,11 @@ describe("Task", () => {
     const result = await T.run(chain(task));
     expect(result).toBe(2);
   });
+
+  it("should taskified a function", async () => {
+    const add = (a: number, b: number) => Promise.resolve(a + b);
+    const taskAdd = T.taskify(add);
+    const result = await T.run(taskAdd(1, 2));
+    expect(result).toBe(3);
+  });
 });
