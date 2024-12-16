@@ -1,10 +1,4 @@
-import { Either } from "./either.ts";
-import { TaskEither } from "./task-either.ts";
-
-export interface URItoKind2<E, A> {
-  Either: Either<E, A>;
-  TaskEither: TaskEither<E, A>;
-}
+export interface URItoKind2<E, A> {}
 
 export type URIS2 = keyof URItoKind2<unknown, unknown>;
 

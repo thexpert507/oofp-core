@@ -4,6 +4,7 @@ import { Kind, URIS } from "./URIS.ts";
 import { Kind2, URIS2 } from "./URIS2.ts";
 import { Monad } from "./monad.ts";
 import { Monad2 } from "./monad-2.ts";
+import { pipe } from "./pipe.ts";
 
 export interface MaybeT<F extends URIS> {
   lift: <A>(ma: Kind<F, A>) => Kind<F, M.Maybe<A>>;
@@ -25,11 +26,9 @@ const base = <F extends URIS>(mo: Monad<F>): MaybeT<F> => ({
   map: <A, B>(f: Fn<A, B>) => mo.map(M.map(f)),
   chain:
     <A, B>(f: Fn<A, Kind<F, M.Maybe<B>>>) =>
-    (as: Kind<F, M.Maybe<A>>) =>
-      mo.chain((ma) => {
-        if (M.isNothing(ma)) return mo.of(M.nothing()) as Kind<F, M.Maybe<B>>;
-        return f(M.extract(ma) as unknown as A) as Kind<F, M.Maybe<B>>;
-      })(as),
+    (as: Kind<F, M.Maybe<A>>) => {
+      return pipe(as, mo.chain(M.fold(() => mo.of(M.nothing<B>()), f)));
+    },
 });
 
 const base2 = <F extends URIS2>(mo: Monad2<F>): BiMaybeT<F> => ({

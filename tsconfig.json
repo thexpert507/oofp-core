@@ -20,9 +20,15 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "paths": {
+      "@/*": [
+        "./lib/*"
+      ]
+    }
   },
   "include": [
-    "lib"
+    "lib",
+    "tests"
   ]
 }

@@ -1,11 +1,6 @@
-import { Maybe } from "./maybe.ts";
-import { Task } from "./task.ts";
-
 export interface URItoKind<A> {
   Array: Array<A>;
   Promise: Promise<A>;
-  Maybe: Maybe<A>;
-  Task: Task<A>;
 }
 
 export type URIS = keyof URItoKind<unknown>;

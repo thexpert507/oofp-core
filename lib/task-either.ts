@@ -14,6 +14,12 @@ export type URI = typeof URI;
 
 export type TaskEither<E, T> = Task<Either<E, T>>;
 
+declare module "@/URIS2" {
+  interface URItoKind2<E, A> {
+    TaskEither: TaskEither<E, A>;
+  }
+}
+
 export const taskify =
   <Args extends any[], R>(fn: (...args: Args) => Promise<R>) =>
   (...args: Args): TaskEither<Error, R> =>

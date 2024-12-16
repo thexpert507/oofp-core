@@ -20,8 +20,12 @@ describe("Compose", () => {
   });
 
   it("3 functions", () => {
-    const composed = compose(M.getOrElse(0), E.getOrElse(M.just(0)), E.identity<never, number>);
-    const result = composed(E.right(10));
+    const composed = compose(
+      M.getOrElse(0),
+      E.getOrElse(() => M.just(0)),
+      E.identity<never, M.Maybe<number>>
+    );
+    const result = composed(E.right(M.just(10)));
     expect(result).toBe(10);
   });
 
@@ -54,6 +58,6 @@ describe("Compose", () => {
     const f2 = (x: number) => x * 2;
     const composed = compose(E.map(f1), E.map(f2), E.identity<never, number>);
     const result = composed(E.right(2));
-    expect(E.getOrElse(0)(result)).toBe(5);
+    expect(E.getOrElse(() => 0)(result)).toBe(5);
   });
 });

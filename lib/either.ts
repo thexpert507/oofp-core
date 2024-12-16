@@ -6,6 +6,12 @@ import { Monad2 } from "./monad-2.ts";
 export const URI = "Either";
 export type URI = typeof URI;
 
+declare module "@/URIS2" {
+  interface URItoKind2<E, A> {
+    Either: Either<E, A>;
+  }
+}
+
 export type Left<E> = { tag: "Left"; value: E };
 export type Right<A> = { tag: "Right"; value: A };
 export type Either<E = never, A = never> = Left<E> | Right<A>;
@@ -116,4 +122,4 @@ export const applyw =
 
 interface EF extends Monad2<URI> {}
 
-export const E: EF = { URI, bimap, chain, left, right, join, of, map };
+export const E: EF = { URI, bimap, chain, join, of, map };

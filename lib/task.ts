@@ -8,6 +8,12 @@ export type URI = typeof URI;
 
 export type Task<T> = () => Promise<T>;
 
+declare module "@/URIS" {
+  interface URItoKind<A> {
+    Task: Task<A>;
+  }
+}
+
 export const taskify =
   <Args extends any[], R>(fn: (...args: Args) => Promise<R>) =>
   (...args: Args): Task<R> =>
