@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import * as TE from "../lib/task-either";
 import * as E from "../lib/either";
 import * as T from "../lib/task";
+import { pipe } from "@/pipe";
 
 describe("TaskEither", () => {
   it("should create a right TaskEither", async () => {
@@ -75,5 +76,18 @@ describe("TaskEither", () => {
     const taskEither = TE.tryCatch(() => "error")(task);
     const result = await TE.run(taskEither);
     expect(result).toEqual(E.left("error"));
+  });
+
+  it("should fold a TaskEither", async () => {
+    const result = await pipe(
+      TE.of("success"),
+      TE.fold(
+        (e) => `error: ${e}`,
+        (a) => `success: ${a}`
+      ),
+      T.run
+    );
+
+    expect(result).toEqual("success: success");
   });
 });

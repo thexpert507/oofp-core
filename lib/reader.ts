@@ -18,6 +18,11 @@ export const of =
   () =>
     value;
 
+export const ask =
+  <R>(): Reader<R, R> =>
+  (r: R) =>
+    r;
+
 export const rmap =
   <A, B>(fn: Fn<A, B>) =>
   <R>(as: Reader<R, A>): Reader<R, B> =>
@@ -46,6 +51,23 @@ export const chain =
   (ra: Reader<R, A>): Reader<R, B> =>
   (r: R) =>
     pipe(ra(r), fn, call(r));
+
+export const chainw =
+  <R2, A, B>(fn: Fn<A, Reader<R2, B>>) =>
+  <R>(ra: Reader<R, A>): Reader<R & R2, B> =>
+  (r: R & R2) =>
+    pipe(ra(r), fn, call(r));
+
+export const provide =
+  <R extends Record<any, any>, R2 extends Partial<R>>(r2: R2) =>
+  <A>(ra: Reader<R, A>): Reader<Omit<R, keyof R2>, A> =>
+  (r: Omit<R, keyof R2>) =>
+    ra({ ...r2, ...r } as unknown as R);
+
+export const run =
+  <R>(r: R) =>
+  <A>(ra: Reader<R, A>): A =>
+    ra(r);
 
 interface RF extends ProMonad2<URI> {}
 

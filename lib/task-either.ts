@@ -96,6 +96,21 @@ export const chainw =
   <E>(as: TaskEither<E, A>): TaskEither<E | E2, B> =>
     pipe(as, T.chain(E.fold(left<E | E2, B>, f)));
 
+export const chainLeft =
+  <E, A>(f: Fn<E, TaskEither<E, A>>) =>
+  (as: TaskEither<E, A>): TaskEither<E, A> =>
+    pipe(as, T.chain(E.fold(f, right<E, A>)));
+
+export const chainLeftw =
+  <E2, E, A>(f: Fn<E, TaskEither<E2, A>>) =>
+  (as: TaskEither<E, A>): TaskEither<E | E2, A> =>
+    pipe(as, T.chain(E.fold(f, right<E | E2, A>)));
+
+export const fold =
+  <E, A, B>(onLeft: Fn<E, B>, onRight: Fn<A, B>) =>
+  (as: TaskEither<E, A>): Task<B> =>
+    pipe(as, T.map(E.fold(onLeft, onRight)));
+
 export const orElse = <E, A, E2>(f: Fn<E, TaskEither<E2, A>>) =>
   compose(T.chain(E.fold(f, right<E2, A>)));
 
@@ -166,6 +181,12 @@ export const sequenceArray = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[
   }, of<E, A[]>([]));
 };
 
+export const concurrent = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[]> => {
+  return () => {
+    return Promise.all(tasks.map(run)).then(E.right).catch(E.left) as Promise<Either<E, A[]>>;
+  };
+};
+
 interface MTaskEither<F extends URIS2> extends Monad2<F> {}
 
-export const TE: MTaskEither<URI> = { URI, of, map, bimap, join, chain, left, right };
+export const TE: MTaskEither<URI> = { URI, of, map, bimap, join, chain };

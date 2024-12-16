@@ -16,7 +16,7 @@ export default defineConfig({
         either: resolve(__dirname, "lib/either.ts"),
         id: resolve(__dirname, "lib/id.ts"),
         list: resolve(__dirname, "lib/list.ts"),
-        ["maybe-t"]: resolve(__dirname, "lib/maybe-t.ts"),
+        ["maybe-t"]: resolve(__dirname, "lib/maybe-t/index.ts"),
         maybe: resolve(__dirname, "lib/maybe.ts"),
         memo: resolve(__dirname, "lib/memo.ts"),
         pipe: resolve(__dirname, "lib/pipe.ts"),

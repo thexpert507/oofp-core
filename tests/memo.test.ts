@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { randomInt } from "node:crypto";
-import { memo } from "../lib/memo.ts";
+import { memo } from "@/memo.ts";
 
 const factorial = (n: number): number => {
   if (n === 0) return 1;
