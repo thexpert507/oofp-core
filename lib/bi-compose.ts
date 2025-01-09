@@ -1,4 +1,4 @@
-import { BiFunctor } from "./bi-functor.ts";
+import { BiFunctor2 } from "./functor-2.ts";
 import { Fn } from "./function.ts";
 import { Functor } from "./functor.ts";
 import { Kind, URIS } from "./URIS.ts";
@@ -12,7 +12,7 @@ export type Bicompose<F extends URIS2, FA extends URIS, FB extends URIS> = {
 };
 
 export const bicompose = <F extends URIS2, FA extends URIS, FB extends URIS>(
-  bifunctor: BiFunctor<F>,
+  bifunctor: BiFunctor2<F>,
   fa: Functor<FA>,
   fb: Functor<FB>
 ): Bicompose<F, FA, FB> => ({

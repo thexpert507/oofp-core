@@ -1,3 +1,4 @@
+import { Applicative } from "./applicative.ts";
 import { Monad } from "./monad.ts";
 
 export const URI = "Promise";
@@ -25,8 +26,13 @@ export const chain =
   (value: Promise<A>): Promise<B> =>
     value.then(f);
 
+export const apply =
+  <A, B>(fab: Promise<(a: A) => B>) =>
+  (fa: Promise<A>): Promise<B> =>
+    fab.then((f) => fa.then(f));
+
 export const isPromise = <A>(value: unknown): value is Promise<A> => value instanceof Promise;
 
-interface PF extends Monad<URI> {}
+interface PF extends Monad<URI>, Applicative<URI> {}
 
-export const P: PF = { URI, map, join, of, chain };
+export const P: PF = { URI, map, join, of, chain, apply };

@@ -10,19 +10,21 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
+        ["maybe-t"]: resolve(__dirname, "lib/maybe-t/index.ts"),
+        utils: resolve(__dirname, "lib/utils/index.ts"),
         ["bi-compose"]: resolve(__dirname, "lib/bi-compose.ts"),
         compose: resolve(__dirname, "lib/compose.ts"),
         curry: resolve(__dirname, "lib/curry.ts"),
         either: resolve(__dirname, "lib/either.ts"),
         id: resolve(__dirname, "lib/id.ts"),
         list: resolve(__dirname, "lib/list.ts"),
-        ["maybe-t"]: resolve(__dirname, "lib/maybe-t/index.ts"),
         maybe: resolve(__dirname, "lib/maybe.ts"),
         memo: resolve(__dirname, "lib/memo.ts"),
         pipe: resolve(__dirname, "lib/pipe.ts"),
         profunctor: resolve(__dirname, "lib/profunctor.ts"),
         promise: resolve(__dirname, "lib/promise.ts"),
         reader: resolve(__dirname, "lib/reader.ts"),
+        state: resolve(__dirname, "lib/state.ts"),
         ["task-either"]: resolve(__dirname, "lib/task-either.ts"),
         task: resolve(__dirname, "lib/task.ts"),
       },

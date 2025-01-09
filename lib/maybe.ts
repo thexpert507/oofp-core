@@ -1,12 +1,13 @@
 import { Monad } from "@/monad.ts";
 import { match } from "ts-pattern";
+import { Fn } from "./function";
 
 export const URI = "Maybe";
 export type URI = typeof URI;
 
 export type Maybe<T = never> = { kind: "Just"; value: T } | { kind: "Nothing" };
 
-declare module "@/URIS" {
+declare module "./URIS" {
   interface URItoKind<A> {
     Maybe: Maybe<A>;
   }
@@ -16,6 +17,9 @@ const Nothing: Maybe<unknown> = { kind: "Nothing" };
 
 export const just = <T>(value: T): Maybe<T> => ({ kind: "Just", value });
 export const nothing = <T>(): Maybe<T> => Nothing;
+
+export const fromNullable = <T>(value: T | null | undefined): Maybe<T> =>
+  value === null || value === undefined ? Nothing : just(value);
 
 export const of = <T>(value: T | null | undefined): Maybe<T> =>
   match(value)
@@ -31,6 +35,13 @@ export const isJust = <T>(value: Maybe<T>): value is { kind: "Just"; value: T } 
   !isNothing(value);
 
 export const identity = <T>(value: Maybe<T>): Maybe<T> => value;
+
+export const iif =
+  <T>(condition: Fn<T, boolean>) =>
+  (value: Maybe<T>): Maybe<T> => {
+    if (isNothing(value)) return value;
+    return condition(value.value) ? value : Nothing;
+  };
 
 export const map =
   <T, U>(fn: (value: T) => U) =>

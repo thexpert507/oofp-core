@@ -3,13 +3,26 @@
   "version": "0.0.1",
   "type": "module",
   "exports": {
+    "./maybe-t": {
+      "types": "./dist/maybe-t/index.d.ts",
+      "import": "./dist/es/maybe-t.js",
+      "require": "./dist/cjs/maybe-t.cjs"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/es/utils.js",
+      "require": "./dist/cjs/utils.cjs"
+    },
+    "./applicative-2": {
+      "types": "./dist/applicative-2.d.ts"
+    },
+    "./applicative": {
+      "types": "./dist/applicative.d.ts"
+    },
     "./bi-compose": {
       "types": "./dist/bi-compose.d.ts",
       "import": "./dist/es/bi-compose.js",
       "require": "./dist/cjs/bi-compose.cjs"
-    },
-    "./bi-functor": {
-      "types": "./dist/bi-functor.d.ts"
     },
     "./chain-2": {
       "types": "./dist/chain-2.d.ts"
@@ -35,6 +48,9 @@
     "./function": {
       "types": "./dist/function.d.ts"
     },
+    "./functor-2": {
+      "types": "./dist/functor-2.d.ts"
+    },
     "./functor": {
       "types": "./dist/functor.d.ts"
     },
@@ -43,15 +59,16 @@
       "import": "./dist/es/id.js",
       "require": "./dist/cjs/id.cjs"
     },
+    "./join-2": {
+      "types": "./dist/join-2.d.ts"
+    },
+    "./join": {
+      "types": "./dist/join.d.ts"
+    },
     "./list": {
       "types": "./dist/list.d.ts",
       "import": "./dist/es/list.js",
       "require": "./dist/cjs/list.cjs"
-    },
-    "./maybe-t": {
-      "types": "./dist/maybe-t.d.ts",
-      "import": "./dist/es/maybe-t.js",
-      "require": "./dist/cjs/maybe-t.cjs"
     },
     "./maybe": {
       "types": "./dist/maybe.d.ts",
@@ -94,6 +111,11 @@
       "types": "./dist/reader.d.ts",
       "import": "./dist/es/reader.js",
       "require": "./dist/cjs/reader.cjs"
+    },
+    "./state": {
+      "types": "./dist/state.d.ts",
+      "import": "./dist/es/state.js",
+      "require": "./dist/cjs/state.cjs"
     },
     "./task-either": {
       "types": "./dist/task-either.d.ts",

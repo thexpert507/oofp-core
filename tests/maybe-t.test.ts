@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { maybeT } from "@/maybe-t";
 import { compose } from "@/compose.ts";
 import * as P from "@/promise.ts";
+import * as TE from "@/task-either.ts";
 import * as M from "@/maybe.ts";
 import { id } from "@/id.ts";
 import { pipe } from "@/pipe.ts";
@@ -50,5 +51,16 @@ describe("MaybeT", () => {
     const toUpperCase = (value: string) => Promise.resolve(M.of(value.toUpperCase()));
     const result = await MT.chain(toUpperCase)(Promise.resolve(M.nothing()));
     expect(result).toEqual(M.nothing());
+  });
+
+  it("should handle uris 2", async () => {
+    const MTE = maybeT(TE);
+
+    const value = "Hello, World!";
+    pipe(
+      TE.of(value),
+      TE.map(M.of),
+      MTE.map((x) => x.toUpperCase())
+    );
   });
 });

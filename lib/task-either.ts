@@ -2,19 +2,19 @@ import type { Either } from "./either";
 import type { Task } from "./task";
 import * as T from "./task";
 import * as E from "./either";
-import { URIS2 } from "./URIS2";
 import { Monad2 } from "./monad-2";
 import { compose } from "./compose";
 import { Fn } from "./function";
 import { P } from "./promise";
 import { pipe } from "./pipe";
+import { BiFunctor2 } from "./functor-2";
 
 export const URI = "TaskEither";
 export type URI = typeof URI;
 
 export type TaskEither<E, T> = Task<Either<E, T>>;
 
-declare module "@/URIS2" {
+declare module "./URIS2" {
   interface URItoKind2<E, A> {
     TaskEither: TaskEither<E, A>;
   }
@@ -42,6 +42,11 @@ export const tryCatch =
       .then(E.right)
       .catch((error) => E.left(onError(error))) as Promise<Either<E, A>>;
   };
+
+export const fromPromise = <A>(fn: () => Promise<A>): TaskEither<Error, A> => {
+  const mapE = (e: unknown) => new Error(String(e));
+  return tryCatch(mapE)(fn);
+};
 
 export const identity = <E, A>(tea: TaskEither<E, A>): TaskEither<E, A> => tea;
 
@@ -187,6 +192,6 @@ export const concurrent = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[]> 
   };
 };
 
-interface MTaskEither<F extends URIS2> extends Monad2<F> {}
+interface TEF extends Monad2<URI>, BiFunctor2<URI> {}
 
-export const TE: MTaskEither<URI> = { URI, of, map, bimap, join, chain };
+export const TE: TEF = { URI, of, map, bimap, join, chain };

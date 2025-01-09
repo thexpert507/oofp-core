@@ -1,7 +1,7 @@
 import { Kind, URIS } from "@/URIS";
 import { Fn } from "@/function";
-import * as M from "@/maybe";
-import { Monad } from "@/monad";
+import * as M from "../maybe";
+import { Monad } from "../monad";
 import { pipe } from "@/pipe";
 
 export interface MaybeT<F extends URIS> {

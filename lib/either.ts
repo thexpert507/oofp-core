@@ -2,6 +2,7 @@ import type { Maybe } from "./maybe.ts";
 import * as M from "./maybe.ts";
 import { Fn } from "./function.ts";
 import { Monad2 } from "./monad-2.ts";
+import { BiFunctor2 } from "./functor-2.ts";
 
 export const URI = "Either";
 export type URI = typeof URI;
@@ -120,6 +121,6 @@ export const applyw =
       : (fa as Left<E | E2>);
   };
 
-interface EF extends Monad2<URI> {}
+interface EF extends Monad2<URI>, BiFunctor2<URI> {}
 
 export const E: EF = { URI, bimap, chain, join, of, map };

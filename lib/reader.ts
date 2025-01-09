@@ -1,6 +1,7 @@
 import { Fn } from "./function";
-import { ProMonad2 } from "./monad-2";
+import { Monad2 } from "./monad-2";
 import { pipe } from "./pipe";
+import { ProFunctor } from "./profunctor";
 
 export const URI = "Reader";
 export type URI = typeof URI;
@@ -18,6 +19,8 @@ export const of =
   () =>
     value;
 
+export const from = <R, A>(fn: Fn<R, A>): Reader<R, A> => fn;
+
 export const ask =
   <R>(): Reader<R, R> =>
   (r: R) =>
@@ -28,6 +31,8 @@ export const rmap =
   <R>(as: Reader<R, A>): Reader<R, B> =>
   (r: R) =>
     pipe(as(r), fn);
+
+export const map = rmap;
 
 export const lmap =
   <R, R2>(fn: Fn<R2, R>) =>
@@ -45,6 +50,11 @@ export const call =
   <R>(r: R) =>
   <A>(ra: Reader<R, A>): A =>
     ra(r);
+
+export const join =
+  <R, A>(rra: Reader<R, Reader<R, A>>): Reader<R, A> =>
+  (r: R) =>
+    rra(r)(r);
 
 export const chain =
   <R, A, B>(fn: Fn<A, Reader<R, B>>) =>
@@ -69,6 +79,6 @@ export const run =
   <A>(ra: Reader<R, A>): A =>
     ra(r);
 
-interface RF extends ProMonad2<URI> {}
+interface RF extends Monad2<URI>, ProFunctor<URI> {}
 
-export const R: RF = { URI, of, rmap, lmap, dimap, chain };
+export const R: RF = { URI, of, map, rmap, lmap, dimap, chain, join };
