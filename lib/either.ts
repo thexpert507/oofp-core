@@ -7,7 +7,7 @@ import { BiFunctor2 } from "./functor-2.ts";
 export const URI = "Either";
 export type URI = typeof URI;
 
-declare module "@/URIS2" {
+declare module "./URIS2" {
   interface URItoKind2<E, A> {
     Either: Either<E, A>;
   }
@@ -110,7 +110,9 @@ export const toMaybe = <E, A>(either: Either<E, A>): Maybe<A> =>
 export const apply =
   <E, A, B>(fab: Either<E, Fn<A, B>>) =>
   (fa: Either<E, A>): Either<E, B> => {
-    return fa.tag === "Right" && fab.tag === "Right" ? right(fab.value(fa.value)) : (fa as Left<E>);
+    if (fa.tag === "Left") return fa;
+    if (fab.tag === "Left") return fab;
+    return right(fab.value(fa.value));
   };
 
 export const applyw =
@@ -120,6 +122,15 @@ export const applyw =
       ? right(fab.value(fa.value))
       : (fa as Left<E | E2>);
   };
+
+export const sequenceArray = <E, A>(eithers: Either<E, A>[]): Either<E, A[]> => {
+  const result: A[] = [];
+  for (const either of eithers) {
+    if (either.tag === "Left") return either;
+    result.push(either.value);
+  }
+  return right(result);
+};
 
 interface EF extends Monad2<URI>, BiFunctor2<URI> {}
 

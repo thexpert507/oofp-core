@@ -1,6 +1,7 @@
 import { Monad } from "@/monad.ts";
 import { match } from "ts-pattern";
 import { Fn } from "./function";
+import { Applicative } from "./applicative";
 
 export const URI = "Maybe";
 export type URI = typeof URI;
@@ -84,6 +85,13 @@ export const getOrElse =
   (mo: Maybe<T>): T =>
     isNothing(mo) ? defaultValue : mo.value;
 
-interface MF extends Monad<URI> {}
+export const toNullable = <T>(mo: Maybe<T>): T | null => (isNothing(mo) ? null : mo.value);
 
-export const M: MF = { URI, map, chain, of, join };
+export const apply =
+  <T, U>(fn: Maybe<Fn<T, U>>) =>
+  (mo: Maybe<T>): Maybe<U> =>
+    isNothing(fn) || isNothing(mo) ? Nothing : just(fn.value(mo.value));
+
+interface MF extends Monad<URI>, Applicative<URI> {}
+
+export const M: MF = { URI, map, chain, of, join, apply };

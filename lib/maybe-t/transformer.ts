@@ -1,7 +1,7 @@
 import { Monad } from "@/monad.ts";
 import { Monad2 } from "@/monad-2.ts";
 import { base, MaybeT } from "./base";
-import { base2, MaybeT2 } from "./bi";
+import { base2, MaybeT2 } from "./base2";
 import { URIS } from "@/URIS";
 import { Applicative } from "@/applicative";
 import { URIS2 } from "@/URIS2";

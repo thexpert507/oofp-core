@@ -8,6 +8,7 @@ import { Fn } from "./function";
 import { P } from "./promise";
 import { pipe } from "./pipe";
 import { BiFunctor2 } from "./functor-2";
+import { Delayable2 } from "./delayable-2";
 
 export const URI = "TaskEither";
 export type URI = typeof URI;
@@ -43,10 +44,16 @@ export const tryCatch =
       .catch((error) => E.left(onError(error))) as Promise<Either<E, A>>;
   };
 
-export const fromPromise = <A>(fn: () => Promise<A>): TaskEither<Error, A> => {
-  const mapE = (e: unknown) => new Error(String(e));
-  return tryCatch(mapE)(fn);
-};
+const mapE = (e: unknown) => new Error(String(e));
+
+export const fromPromise = <A>(fn: () => Promise<A>): TaskEither<Error, A> => tryCatch(mapE)(fn);
+
+export const fromEither =
+  <E, A>(either: Either<E, A>): TaskEither<E, A> =>
+  () =>
+    Promise.resolve(either);
+
+export const fromTask = <A>(task: Task<A>): TaskEither<Error, A> => tryCatch(mapE)(task);
 
 export const identity = <E, A>(tea: TaskEither<E, A>): TaskEither<E, A> => tea;
 
@@ -136,6 +143,15 @@ export const toNullable = compose(T.map(E.toNullable));
 
 export const toMaybe = compose(T.map(E.toMaybe));
 
+export const toPromise = <E, A>(tea: TaskEither<E, A>): Promise<A> => {
+  return tea().then(
+    E.fold(
+      (e) => Promise.reject(e),
+      (a) => Promise.resolve(a)
+    )
+  );
+};
+
 export const apply =
   <E, A, B>(ap: TaskEither<E, Fn<A, B>>) =>
   (ta: TaskEither<E, A>): TaskEither<E, B> => {
@@ -192,6 +208,14 @@ export const concurrent = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[]> 
   };
 };
 
-interface TEF extends Monad2<URI>, BiFunctor2<URI> {}
+export const delay =
+  (ms: number) =>
+  <E, A>(tea: TaskEither<E, A>): TaskEither<E, A> => {
+    return async () => {
+      return tea().then((ea) => new Promise((resolve) => setTimeout(() => resolve(ea), ms)));
+    };
+  };
 
-export const TE: TEF = { URI, of, map, bimap, join, chain };
+interface TEF extends Monad2<URI>, BiFunctor2<URI>, Delayable2<URI> {}
+
+export const TE: TEF = { URI, of, map, bimap, join, chain, delay };

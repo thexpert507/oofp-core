@@ -1,3 +1,4 @@
+import { Applicative2 } from "./applicative-2";
 import { Fn } from "./function";
 import { Monad2 } from "./monad-2";
 import { pipe } from "./pipe";
@@ -8,7 +9,7 @@ export type URI = typeof URI;
 
 export type Reader<R, A> = (r: R) => A;
 
-declare module "@/URIS2" {
+declare module "./URIS2" {
   interface URItoKind2<E, A> {
     Reader: Reader<E, A>;
   }
@@ -79,6 +80,12 @@ export const run =
   <A>(ra: Reader<R, A>): A =>
     ra(r);
 
-interface RF extends Monad2<URI>, ProFunctor<URI> {}
+export const apply =
+  <R, A, B>(rfa: Reader<R, Fn<A, B>>) =>
+  (ra: Reader<R, A>): Reader<R, B> =>
+  (r: R) =>
+    pipe(rfa(r), (fa) => pipe(ra(r), (a) => fa(a)));
 
-export const R: RF = { URI, of, map, rmap, lmap, dimap, chain, join };
+interface RF extends Monad2<URI>, ProFunctor<URI>, Applicative2<URI> {}
+
+export const R: RF = { URI, of, map, rmap, lmap, dimap, chain, join, apply };

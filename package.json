@@ -40,6 +40,12 @@
       "import": "./dist/es/curry.js",
       "require": "./dist/cjs/curry.cjs"
     },
+    "./delayable": {
+      "types": "./dist/delayable.d.ts"
+    },
+    "./delayable-2": {
+      "types": "./dist/delayable-2.d.ts"
+    },
     "./either": {
       "types": "./dist/either.d.ts",
       "import": "./dist/es/either.js",
