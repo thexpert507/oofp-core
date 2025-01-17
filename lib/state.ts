@@ -1,9 +1,9 @@
-import { Applicative2 } from "./applicative-2";
+import { Applicative2 } from "./applicative";
 import { Fn } from "./function";
-import { Functor2 } from "./functor-2";
-import { Monad2 } from "./monad-2";
+import { Functor2 } from "./functor";
+import { Monad2 } from "./monad";
 import { pipe } from "./pipe";
-import { Pointed2 } from "./pointed-2";
+import { Pointed2 } from "./pointed";
 
 export const URI = "State";
 export type URI = typeof URI;

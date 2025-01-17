@@ -23,6 +23,7 @@ export default defineConfig({
         pipe: resolve(__dirname, "lib/pipe.ts"),
         profunctor: resolve(__dirname, "lib/profunctor.ts"),
         promise: resolve(__dirname, "lib/promise.ts"),
+        ["reader-task-either"]: resolve(__dirname, "lib/reader-task-either.ts"),
         reader: resolve(__dirname, "lib/reader.ts"),
         state: resolve(__dirname, "lib/state.ts"),
         ["task-either"]: resolve(__dirname, "lib/task-either.ts"),

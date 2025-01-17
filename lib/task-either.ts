@@ -2,13 +2,13 @@ import type { Either } from "./either";
 import type { Task } from "./task";
 import * as T from "./task";
 import * as E from "./either";
-import { Monad2 } from "./monad-2";
+import { Monad2 } from "./monad";
 import { compose } from "./compose";
 import { Fn } from "./function";
 import { P } from "./promise";
 import { pipe } from "./pipe";
-import { BiFunctor2 } from "./functor-2";
-import { Delayable2 } from "./delayable-2";
+import { BiFunctor2 } from "./functor";
+import { Delayable2 } from "./delayable";
 
 export const URI = "TaskEither";
 export type URI = typeof URI;
@@ -203,9 +203,7 @@ export const sequenceArray = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[
 };
 
 export const concurrent = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[]> => {
-  return () => {
-    return Promise.all(tasks.map(run)).then(E.right).catch(E.left) as Promise<Either<E, A[]>>;
-  };
+  return () => Promise.all(tasks.map(run)).then(E.sequenceArray);
 };
 
 export const delay =

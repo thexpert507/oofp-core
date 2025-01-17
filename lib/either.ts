@@ -1,8 +1,8 @@
 import type { Maybe } from "./maybe.ts";
 import * as M from "./maybe.ts";
 import { Fn } from "./function.ts";
-import { Monad2 } from "./monad-2.ts";
-import { BiFunctor2 } from "./functor-2.ts";
+import { Monad2 } from "./monad.ts";
+import { BiFunctor2 } from "./functor.ts";
 
 export const URI = "Either";
 export type URI = typeof URI;
@@ -20,6 +20,9 @@ export type Either<E = never, A = never> = Left<E> | Right<A>;
 export const left = <E, A>(value: E): Either<E, A> => ({ tag: "Left", value });
 export const right = <E, A>(value: A): Either<E, A> => ({ tag: "Right", value });
 export const of = right;
+
+export const isLeft = <E, A>(either: Either<E, A>): either is Left<E> => either.tag === "Left";
+export const isRight = <E, A>(either: Either<E, A>): either is Right<A> => either.tag === "Right";
 
 export const fromNullable =
   <E>(onNone: E) =>

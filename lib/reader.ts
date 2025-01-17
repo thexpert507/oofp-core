@@ -1,6 +1,6 @@
-import { Applicative2 } from "./applicative-2";
+import { Applicative2 } from "./applicative";
 import { Fn } from "./function";
-import { Monad2 } from "./monad-2";
+import { Monad2 } from "./monad";
 import { pipe } from "./pipe";
 import { ProFunctor } from "./profunctor";
 

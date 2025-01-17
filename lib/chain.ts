@@ -1,6 +1,11 @@
+import { Kind2, URIS2 } from "@/URIS2";
 import { Fn } from "./function.ts";
 import { Kind, URIS } from "./URIS.ts";
 
 export interface Chain<F extends URIS> {
   chain: <A, B>(f: Fn<A, Kind<F, B>>) => (as: Kind<F, A>) => Kind<F, B>;
+}
+
+export interface Chain2<F extends URIS2> {
+  readonly chain: <L, A, A2>(f: Fn<A, Kind2<F, L, A2>>) => (ma: Kind2<F, L, A>) => Kind2<F, L, A2>;
 }

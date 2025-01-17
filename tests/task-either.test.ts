@@ -90,4 +90,14 @@ describe("TaskEither", () => {
 
     expect(result).toEqual("success: success");
   });
+
+  it("should run concurrent", async () => {
+    const t1 = TE.of(1);
+    const t2 = TE.of(2);
+    const t3 = TE.of(3);
+
+    const result = await TE.run(TE.concurrent([t1, t2, t3]));
+
+    expect(result).toEqual(E.right([1, 2, 3]));
+  });
 });

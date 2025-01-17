@@ -13,9 +13,6 @@
       "import": "./dist/es/utils.js",
       "require": "./dist/cjs/utils.cjs"
     },
-    "./applicative-2": {
-      "types": "./dist/applicative-2.d.ts"
-    },
     "./applicative": {
       "types": "./dist/applicative.d.ts"
     },
@@ -23,9 +20,6 @@
       "types": "./dist/bi-compose.d.ts",
       "import": "./dist/es/bi-compose.js",
       "require": "./dist/cjs/bi-compose.cjs"
-    },
-    "./chain-2": {
-      "types": "./dist/chain-2.d.ts"
     },
     "./chain": {
       "types": "./dist/chain.d.ts"
@@ -43,9 +37,6 @@
     "./delayable": {
       "types": "./dist/delayable.d.ts"
     },
-    "./delayable-2": {
-      "types": "./dist/delayable-2.d.ts"
-    },
     "./either": {
       "types": "./dist/either.d.ts",
       "import": "./dist/es/either.js",
@@ -54,9 +45,6 @@
     "./function": {
       "types": "./dist/function.d.ts"
     },
-    "./functor-2": {
-      "types": "./dist/functor-2.d.ts"
-    },
     "./functor": {
       "types": "./dist/functor.d.ts"
     },
@@ -64,9 +52,6 @@
       "types": "./dist/id.d.ts",
       "import": "./dist/es/id.js",
       "require": "./dist/cjs/id.cjs"
-    },
-    "./join-2": {
-      "types": "./dist/join-2.d.ts"
     },
     "./join": {
       "types": "./dist/join.d.ts"
@@ -86,9 +71,6 @@
       "import": "./dist/es/memo.js",
       "require": "./dist/cjs/memo.cjs"
     },
-    "./monad-2": {
-      "types": "./dist/monad-2.d.ts"
-    },
     "./monad": {
       "types": "./dist/monad.d.ts"
     },
@@ -96,9 +78,6 @@
       "types": "./dist/pipe.d.ts",
       "import": "./dist/es/pipe.js",
       "require": "./dist/cjs/pipe.cjs"
-    },
-    "./pointed-2": {
-      "types": "./dist/pointed-2.d.ts"
     },
     "./pointed": {
       "types": "./dist/pointed.d.ts"
@@ -112,6 +91,11 @@
       "types": "./dist/promise.d.ts",
       "import": "./dist/es/promise.js",
       "require": "./dist/cjs/promise.cjs"
+    },
+    "./reader-task-either": {
+      "types": "./dist/reader-task-either.d.ts",
+      "import": "./dist/es/reader-task-either.js",
+      "require": "./dist/cjs/reader-task-either.cjs"
     },
     "./reader": {
       "types": "./dist/reader.d.ts",
@@ -138,6 +122,9 @@
     },
     "./URIS2": {
       "types": "./dist/URIS2.d.ts"
+    },
+    "./URIS3": {
+      "types": "./dist/URIS3.d.ts"
     }
   },
   "scripts": {

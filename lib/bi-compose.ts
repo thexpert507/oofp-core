@@ -1,4 +1,4 @@
-import { BiFunctor2 } from "./functor-2.ts";
+import { BiFunctor2 } from "./functor.ts";
 import { Fn } from "./function.ts";
 import { Functor } from "./functor.ts";
 import { Kind, URIS } from "./URIS.ts";

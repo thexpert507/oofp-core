@@ -1,7 +1,7 @@
 import { Kind2, URIS2 } from "@/URIS2";
 import { Fn } from "@/function";
 import * as M from "../maybe";
-import { Monad2 } from "@/monad-2";
+import { Monad2 } from "@/monad";
 
 export interface MaybeT2<F extends URIS2> {
   lift: <E, A>(ma: Kind2<F, E, A>) => Kind2<F, E, M.Maybe<A>>;

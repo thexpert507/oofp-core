@@ -1,11 +1,11 @@
 import { Monad } from "@/monad.ts";
-import { Monad2 } from "@/monad-2.ts";
+import { Monad2 } from "@/monad.ts";
 import { base, MaybeT } from "./base";
 import { base2, MaybeT2 } from "./base2";
 import { URIS } from "@/URIS";
 import { Applicative } from "@/applicative";
 import { URIS2 } from "@/URIS2";
-import { Applicative2 } from "@/applicative-2";
+import { Applicative2 } from "@/applicative";
 
 type Instance<F extends URIS> = Monad<F> & Applicative<F>;
 type Instance2<F extends URIS2> = Monad2<F> & Applicative2<F>;

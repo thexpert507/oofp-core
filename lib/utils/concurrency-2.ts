@@ -2,9 +2,9 @@ import * as L from "@/list";
 import { pipe } from "@/pipe";
 import { id } from "@/id";
 import { Kind2, URIS2 } from "@/URIS2";
-import { Monad2 } from "@/monad-2";
-import { Applicative2 } from "@/applicative-2";
-import { Delayable2 } from "@/delayable-2";
+import { Monad2 } from "@/monad";
+import { Applicative2 } from "@/applicative";
+import { Delayable2 } from "@/delayable";
 
 // Tipo de la instancia de la mónada
 type Instance<F extends URIS2> = Monad2<F> & Applicative2<F> & Delayable2<F>;
@@ -20,7 +20,10 @@ type Config = { concurrency: number; delay?: number };
 
 const reduceFn =
   <F extends URIS2>(mo: Instance<F>) =>
-  <E, Args extends ArgsType<F, E>>(acc: Kind2<F, E, VOK<F, Args>>, curr: Kind2<F, E, any>) => {
+  <E, Args extends Kind2<F, E, any>[] | ArgsType<F, E>>(
+    acc: Kind2<F, E, VOK<F, Args>>,
+    curr: Kind2<F, E, any>
+  ) => {
     const merge = (result: any) => (values: VOK<F, Args>) => [...values, result];
     return pipe(acc, mo.apply(pipe(curr, mo.map(merge)))) as Kind2<F, E, VOK<F, Args>>;
   };
@@ -28,7 +31,7 @@ const reduceFn =
 export const concurrency2 =
   <F extends URIS2>(mo: Instance<F>) =>
   (config: Config) =>
-  <E, Args extends ArgsType<F, E>>(
+  <E, Args extends Kind2<F, E, any>[] | ArgsType<F, E>>(
     args: Args,
     acc = mo.of<E, VOK<F, Args>>([] as any)
   ): Kind2<F, E, VOK<F, Args>> => {

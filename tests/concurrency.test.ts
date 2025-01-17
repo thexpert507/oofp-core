@@ -31,7 +31,9 @@ describe("Concurrency", () => {
     const t3 = pipe(TE.of(3), TE.tap(log));
     const t4 = pipe(TE.of(4), TE.tap(log));
 
-    const result = concurrently([t1, t2, t3, t4]);
+    const arr: TE.TaskEither<unknown, number>[] = [t1, t2, t3, t4];
+
+    const result = concurrently(arr);
 
     expect(await result()).toEqual(E.right([1, 2, 3, 4]));
   });

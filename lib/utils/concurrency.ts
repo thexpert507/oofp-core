@@ -20,7 +20,7 @@ type Config = { concurrency: number; delay?: number };
 
 const reduceFn =
   <F extends URIS>(mo: Instance<F>) =>
-  <Args extends ArgsType<F>>(acc: Kind<F, VOK<F, Args>>, curr: Kind<F, any>) => {
+  <Args extends ArgsType<F> | Kind<F, any>[]>(acc: Kind<F, VOK<F, Args>>, curr: Kind<F, any>) => {
     const merge = (result: any) => (values: VOK<F, Args>) => [...values, result];
     return pipe(acc, mo.apply(pipe(curr, mo.map(merge)))) as Kind<F, VOK<F, Args>>;
   };
@@ -28,7 +28,7 @@ const reduceFn =
 export const concurrency =
   <F extends URIS>(mo: Instance<F>) =>
   (config: Config) =>
-  <Args extends ArgsType<F>>(
+  <Args extends ArgsType<F> | Kind<F, any>[]>(
     args: Args,
     acc = mo.of([] as VOK<F, Args>)
   ): Kind<F, VOK<F, Args>> => {
