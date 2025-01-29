@@ -12,12 +12,12 @@ type ValueOfKind<F extends URIS, Args extends Kind<F, any>[]> = {
   [K in keyof Args]: Args[K] extends Kind<F, infer A> ? A : never;
 };
 
-type ArgsType<F extends URIS> = [Kind<F, any>, ...Kind<F, any>[]];
+type ArgsType<F extends URIS> = [Kind<F, any>, ...Kind<F, any>[]] | Kind<F, any>[];
 
 // `sequenceT` que toma una instancia de la mónada y un array de mónadas, y devuelve una mónada con el tipo de los resultados combinados
 export const sequenceT =
   <F extends URIS>(mo: Instance<F>) =>
-  <Args extends ArgsType<F>>(...args: Args): Kind<F, ValueOfKind<F, Args>> => {
+  <Args extends ArgsType<F>>(args: Args): Kind<F, ValueOfKind<F, Args>> => {
     const initial = mo.of([] as ValueOfKind<F, Args>);
 
     const merge = (result: any) => (values: ValueOfKind<F, Args>) => [...values, result];

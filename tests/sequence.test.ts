@@ -7,13 +7,13 @@ import { sequenceT, sequenceT2 } from "@/utils";
 
 describe("Sequence array", () => {
   it("should be able to sequence two maybes", () => {
-    const result = sequenceT(M)(M.just(1), M.just("2"));
+    const result = sequenceT(M)([M.just(1), M.just("2")]);
 
     expect(M.toNullable(result)).toEqual([1, "2"]);
   });
 
   it("should be able to sequence two tasks", async () => {
-    const result = sequenceT(T)(T.of(1), T.of("2"));
+    const result = sequenceT(T)([T.of(1), T.of("2")]);
 
     expect(await result()).toEqual([1, "2"]);
   });
