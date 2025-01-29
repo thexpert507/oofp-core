@@ -9,6 +9,7 @@ import { P } from "./promise";
 import { pipe } from "./pipe";
 import { BiFunctor2 } from "./functor";
 import { Delayable2 } from "./delayable";
+import { id } from "./id";
 
 export const URI = "TaskEither";
 export type URI = typeof URI;
@@ -102,6 +103,20 @@ export const chain =
   <E, A, B>(f: Fn<A, TaskEither<E, B>>) =>
   (as: TaskEither<E, A>): TaskEither<E, B> =>
     pipe(as, T.chain(E.fold(left<E, B>, f)));
+
+export const tchain =
+  <E, A>(f: Fn<A, TaskEither<E, void>>) =>
+  (as: TaskEither<E, A>): TaskEither<E, A> => {
+    return pipe(
+      as,
+      chain((a) =>
+        pipe(
+          f(a),
+          map(() => a)
+        )
+      )
+    );
+  };
 
 export const chainw =
   <E2, A, B>(f: Fn<A, TaskEither<E2, B>>) =>
@@ -210,8 +225,29 @@ export const delay =
   (ms: number) =>
   <E, A>(tea: TaskEither<E, A>): TaskEither<E, A> => {
     return async () => {
-      return tea().then((ea) => new Promise((resolve) => setTimeout(() => resolve(ea), ms)));
+      await new Promise((resolve) => setTimeout(resolve, ms));
+      return tea();
     };
+  };
+
+type RetryOptions<E = unknown> = {
+  maxRetries: number;
+  delay?: number;
+  onError?: Fn<E, void>;
+  skipIf?: Fn<E, boolean>;
+};
+export const retry =
+  <E>(options: RetryOptions<E>, acc = 0) =>
+  <A>(ta: TaskEither<E, A>): TaskEither<E, A> => {
+    return pipe(
+      ta,
+      chainLeft((e) => {
+        if (options.skipIf && options.skipIf(e)) return left(e);
+        if (acc >= options.maxRetries) return left(e);
+        if (options.onError) options.onError(e);
+        return pipe(ta, options.delay ? delay(options.delay) : id, retry(options, acc + 1));
+      })
+    );
   };
 
 interface TEF extends Monad2<URI>, BiFunctor2<URI>, Delayable2<URI> {}

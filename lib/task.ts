@@ -10,7 +10,7 @@ export type URI = typeof URI;
 
 export type Task<T> = () => Promise<T>;
 
-declare module "@/URIS" {
+declare module "./URIS" {
   interface URItoKind<A> {
     Task: Task<A>;
   }
@@ -52,12 +52,23 @@ export const chain =
   () =>
     ta().then((a) => run(f(a)));
 
+export const tchain =
+  <A>(f: Fn<A, Task<void>>) =>
+  (ta: Task<A>): Task<A> =>
+  () =>
+    ta().then((a) => run(f(a)).then(() => a));
+
 export const apply =
   <A, B>(tf: Task<Fn<A, B>>) =>
   (ta: Task<A>): Task<B> =>
   async () => {
     return Promise.all([tf(), ta()]).then(([f, a]) => f(a));
   };
+
+export const rejected =
+  <A>(e: Error | string): Task<A> =>
+  () =>
+    Promise.reject(e);
 
 export const delay =
   (ms: number) =>

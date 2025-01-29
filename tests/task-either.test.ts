@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import * as TE from "../lib/task-either";
 import * as E from "../lib/either";
 import * as T from "../lib/task";
@@ -99,5 +99,17 @@ describe("TaskEither", () => {
     const result = await TE.run(TE.concurrent([t1, t2, t3]));
 
     expect(result).toEqual(E.right([1, 2, 3]));
+  });
+
+  it("should retry task", async () => {
+    const task = vi.fn(TE.left("error"));
+
+    const skipIf = (e: string) => e !== "error";
+
+    const taskWhithRetry = pipe(task, TE.retry({ maxRetries: 3, delay: 100, skipIf }));
+
+    await TE.run(taskWhithRetry);
+
+    expect(task).toHaveBeenCalledTimes(4);
   });
 });
