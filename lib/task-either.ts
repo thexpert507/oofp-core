@@ -80,6 +80,43 @@ export const tapLeft =
   <A>(as: TaskEither<E, A>) =>
     pipe(as, T.map(E.tapLeft(f)));
 
+export const tapTE =
+  <E2, A>(f: Fn<A, TaskEither<E2, void>>) =>
+  <E1>(as: TaskEither<E1, A>): TaskEither<E1 | E2, A> => {
+    return pipe(
+      as,
+      T.chain(
+        E.fold(left<E1 | E2, A>, (result) => {
+          return pipe(f(result), T.map(E.fold(E.left<E1 | E2, A>, () => E.right(result))));
+        })
+      )
+    );
+  };
+
+export const tapLeftTE =
+  <E1, E2, A>(f: Fn<E1, TaskEither<E2, void>>) =>
+  (as: TaskEither<E1, A>): TaskEither<E1 | E2, A> => {
+    return pipe(
+      as,
+      T.chain(
+        E.fold(
+          (error) => {
+            return pipe(
+              f(error),
+              T.map(
+                E.fold(
+                  () => E.left(error),
+                  () => E.left(error)
+                )
+              )
+            );
+          },
+          (result) => T.of(E.right(result))
+        )
+      )
+    );
+  };
+
 export const map =
   <A, B>(f: Fn<A, B>) =>
   <E>(as: TaskEither<E, A>) =>

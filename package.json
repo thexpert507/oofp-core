@@ -74,6 +74,11 @@
     "./monad": {
       "types": "./dist/monad.d.ts"
     },
+    "./object": {
+      "types": "./dist/object.d.ts",
+      "import": "./dist/es/object.js",
+      "require": "./dist/cjs/object.cjs"
+    },
     "./pipe": {
       "types": "./dist/pipe.d.ts",
       "import": "./dist/es/pipe.js",

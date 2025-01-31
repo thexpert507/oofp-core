@@ -20,6 +20,7 @@ export default defineConfig({
         list: resolve(__dirname, "lib/list.ts"),
         maybe: resolve(__dirname, "lib/maybe.ts"),
         memo: resolve(__dirname, "lib/memo.ts"),
+        object: resolve(__dirname, "lib/object.ts"),
         pipe: resolve(__dirname, "lib/pipe.ts"),
         profunctor: resolve(__dirname, "lib/profunctor.ts"),
         promise: resolve(__dirname, "lib/promise.ts"),

@@ -23,4 +23,6 @@ export const reduceRight =
 
 export const isEmpty = <A>(list: A[]): boolean => list.length === 0;
 
+export const flatten = <A>(list: A[][]): A[] => list.flat();
+
 export const L = { map } satisfies Functor<"Array">;

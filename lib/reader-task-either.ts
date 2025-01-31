@@ -3,7 +3,8 @@ import { pipe } from "./pipe";
 import * as R from "./reader";
 import { Task } from "./task";
 import * as TE from "./task-either";
-import { concurrency2 } from "./utils";
+import * as O from "./object";
+import { concurrency2, sequenceObjectT2 } from "./utils";
 
 export const URI = "ReaderTaskEither";
 export type URI = typeof URI;
@@ -21,6 +22,11 @@ export const of =
   () =>
     TE.of(a);
 
+export const from =
+  <R, E, A>(te: TE.TaskEither<E, A>): ReaderTaskEither<R, E, A> =>
+  () =>
+    te;
+
 export const ask =
   <R>(): ReaderTaskEither<R, never, R> =>
   (ctx: R) =>
@@ -32,11 +38,37 @@ export const tap =
   (ctx: R) =>
     pipe(rte(ctx), TE.tap(fn));
 
+export const tapR =
+  <R, A>(fn: Fn<R, Fn<A, void>>) =>
+  <E>(rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, A> => {
+    return (ctx: R) => pipe(rte(ctx), TE.tap(fn(ctx)));
+  };
+
 export const tapLeft =
   <R, E, A>(fn: Fn<E, void>) =>
   (rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, A> =>
   (ctx: R) =>
     pipe(rte(ctx), TE.tapLeft(fn));
+
+export const tapRTE =
+  <R2, E2, A>(fn: Fn<A, ReaderTaskEither<R2, E2, void>>) =>
+  <R1, E1>(rte: ReaderTaskEither<R1, E1, A>): ReaderTaskEither<R1 & R2, E1 | E2, A> => {
+    return (ctx: R1 & R2) =>
+      pipe(
+        rte(ctx),
+        TE.tapTE((a) => fn(a)(ctx))
+      );
+  };
+
+export const tapLeftRTE =
+  <R2, E1, E2, A>(fn: Fn<E1, ReaderTaskEither<R2, E2, void>>) =>
+  <R1>(rte: ReaderTaskEither<R1, E1, A>): ReaderTaskEither<R1 & R2, E1 | E2, A> => {
+    return (ctx: R1 & R2) =>
+      pipe(
+        rte(ctx),
+        TE.tapLeftTE((e) => fn(e)(ctx))
+      );
+  };
 
 export const map =
   <A, B>(fn: Fn<A, B>) =>
@@ -128,6 +160,19 @@ export const sequenceArray = <R, E, A>(
   arr: ReaderTaskEither<R, E, A>[]
 ): ReaderTaskEither<R, E, A[]> => {
   return (ctx: R) => TE.sequenceArray(arr.map((rte) => rte(ctx)));
+};
+
+export const sequenceObject = <K extends string, R, E, A>(
+  obj: Record<K, ReaderTaskEither<R, E, A>>
+): ReaderTaskEither<R, E, Record<K, A>> => {
+  return (ctx: R) => {
+    return pipe(
+      obj,
+      O.mapValues((rte) => rte(ctx)),
+      sequenceObjectT2(TE),
+      (d) => d as TE.TaskEither<E, Record<K, A>>
+    );
+  };
 };
 
 type Config = { concurrency: number; delay?: number };
