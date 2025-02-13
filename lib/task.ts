@@ -88,8 +88,7 @@ export const delay =
 
 export const fold =
   <A, R>(g: Fn<unknown, R>, f: Fn<A, R>) =>
-  (ta: Task<A>): Task<R> =>
-  () =>
+  (ta: Task<A>): Promise<R> =>
     ta().then(f).catch(g);
 
 interface MTask<F extends URIS> extends Monad<F>, Applicative<F>, Delayable<F> {}
