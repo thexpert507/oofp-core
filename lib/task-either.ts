@@ -10,6 +10,8 @@ import { pipe } from "./pipe";
 import { BiFunctor2 } from "./functor";
 import { Delayable2 } from "./delayable";
 import { id } from "./id";
+import { sequenceT2, sequenceObjectT2, concurrency2 } from "./utils";
+import { Applicative2 } from "./applicative";
 
 export const URI = "TaskEither";
 export type URI = typeof URI;
@@ -240,24 +242,6 @@ export const sapplyw =
     );
   };
 
-const merge =
-  <E, A>(as: TaskEither<E, A>) =>
-  (acc: A[]) =>
-    pipe(
-      as,
-      map((v) => [...acc, v])
-    );
-
-export const sequenceArray = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[]> => {
-  return tasks.reduce((acc, task) => {
-    return pipe(acc, chain(merge(task)));
-  }, of<E, A[]>([]));
-};
-
-export const concurrent = <E, A>(tasks: TaskEither<E, A>[]): TaskEither<E, A[]> => {
-  return () => Promise.all(tasks.map(run)).then(E.sequenceArray);
-};
-
 export const delay =
   (ms: number) =>
   <E, A>(tea: TaskEither<E, A>): TaskEither<E, A> => {
@@ -287,6 +271,10 @@ export const retry =
     );
   };
 
-interface TEF extends Monad2<URI>, BiFunctor2<URI>, Delayable2<URI> {}
+interface TEF extends Monad2<URI>, BiFunctor2<URI>, Delayable2<URI>, Applicative2<URI> {}
 
-export const TE: TEF = { URI, of, map, bimap, join, chain, delay };
+export const TE: TEF = { URI, of, map, bimap, join, chain, delay, apply };
+
+export const sequence = sequenceT2(TE);
+export const sequenceObject = sequenceObjectT2(TE);
+export const concurrency = concurrency2(TE);

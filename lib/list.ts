@@ -25,4 +25,14 @@ export const isEmpty = <A>(list: A[]): boolean => list.length === 0;
 
 export const flatten = <A>(list: A[][]): A[] => list.flat();
 
+export const chunk =
+  (size: number) =>
+  <A>(list: A[]): A[][] => {
+    const result: A[][] = [];
+    for (let i = 0; i < list.length; i += size) {
+      result.push(list.slice(i, i + size));
+    }
+    return result;
+  };
+
 export const L = { map } satisfies Functor<"Array">;

@@ -4,7 +4,6 @@ import * as R from "./reader";
 import { Task } from "./task";
 import * as TE from "./task-either";
 import * as O from "./object";
-import { concurrency2, sequenceObjectT2 } from "./utils";
 
 export const URI = "ReaderTaskEither";
 export type URI = typeof URI;
@@ -156,10 +155,10 @@ export const apply =
       );
   };
 
-export const sequenceArray = <R, E, A>(
+export const sequence = <R, E, A>(
   arr: ReaderTaskEither<R, E, A>[]
 ): ReaderTaskEither<R, E, A[]> => {
-  return (ctx: R) => TE.sequenceArray(arr.map((rte) => rte(ctx)));
+  return (ctx: R) => TE.sequence(arr.map((rte) => rte(ctx)));
 };
 
 export const sequenceObject = <K extends string, R, E, A>(
@@ -169,7 +168,7 @@ export const sequenceObject = <K extends string, R, E, A>(
     return pipe(
       obj,
       O.mapValues((rte) => rte(ctx)),
-      sequenceObjectT2(TE),
+      TE.sequenceObject,
       (d) => d as TE.TaskEither<E, Record<K, A>>
     );
   };
@@ -179,7 +178,7 @@ type Config = { concurrency: number; delay?: number };
 export const concurrency =
   (config: Config) =>
   <R, E, A>(arr: ReaderTaskEither<R, E, A>[]): ReaderTaskEither<R, E, A[]> => {
-    return (ctx: R) => concurrency2(TE)(config)(arr.map((rte) => rte(ctx)));
+    return (ctx: R) => TE.concurrency(config)(arr.map((rte) => rte(ctx)));
   };
 
 export const delay =

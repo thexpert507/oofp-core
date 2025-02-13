@@ -4,6 +4,7 @@ import * as P from "./promise";
 import { Monad } from "./monad";
 import { Applicative } from "./applicative";
 import { Delayable } from "./delayable";
+import { sequenceT, sequenceObjectT, concurrencyT } from "./utils";
 
 export const URI = "Task";
 export type URI = typeof URI;
@@ -34,6 +35,15 @@ export const tap =
   (ta: Task<A>): Task<A> =>
   () =>
     P.tap(f)(ta());
+
+export const tapRejected =
+  <E = any>(f: Fn<E, void>) =>
+  <A>(ta: Task<A>): Task<A> =>
+  () =>
+    ta().catch((e) => {
+      f(e);
+      return Promise.reject(e);
+    });
 
 export const map =
   <A, B>(f: Fn<A, B>) =>
@@ -79,3 +89,7 @@ export const delay =
 interface MTask<F extends URIS> extends Monad<F>, Applicative<F>, Delayable<F> {}
 
 export const T: MTask<URI> = { URI, of, map, join, chain, apply, delay };
+
+export const sequence = sequenceT(T);
+export const sequenceObject = sequenceObjectT(T);
+export const concurrency = concurrencyT(T);

@@ -87,6 +87,9 @@ export const getOrElse =
 
 export const toNullable = <T>(mo: Maybe<T>): T | null => (isNothing(mo) ? null : mo.value);
 
+export const toUndefined = <T>(mo: Maybe<T>): T | undefined =>
+  isNothing(mo) ? undefined : mo.value;
+
 export const apply =
   <T, U>(fn: Maybe<Fn<T, U>>) =>
   (mo: Maybe<T>): Maybe<U> =>

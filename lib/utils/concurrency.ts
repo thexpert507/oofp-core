@@ -25,7 +25,7 @@ const reduceFn =
     return pipe(acc, mo.apply(pipe(curr, mo.map(merge)))) as Kind<F, VOK<F, Args>>;
   };
 
-export const concurrency =
+export const concurrencyT =
   <F extends URIS>(mo: Instance<F>) =>
   (config: Config) =>
   <Args extends ArgsType<F> | Kind<F, any>[]>(
@@ -42,5 +42,5 @@ export const concurrency =
       mo.chain((values) => pipe(portion, L.reduce(mo.of(values), reduceFn(mo))))
     );
 
-    return concurrency(mo)(config)(rest, newAcc);
+    return concurrencyT(mo)(config)(rest, newAcc);
   };
