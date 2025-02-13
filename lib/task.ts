@@ -87,7 +87,7 @@ export const delay =
     ta().then((a) => new Promise((resolve) => setTimeout(() => resolve(a), ms)));
 
 export const fold =
-  <A, R>(f: Fn<A, R>, g: Fn<unknown, R>) =>
+  <A, R>(g: Fn<unknown, R>, f: Fn<A, R>) =>
   (ta: Task<A>): Task<R> =>
   () =>
     ta().then(f).catch(g);
