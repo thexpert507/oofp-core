@@ -86,6 +86,12 @@ export const delay =
   () =>
     ta().then((a) => new Promise((resolve) => setTimeout(() => resolve(a), ms)));
 
+export const fold =
+  <A, R>(f: Fn<A, R>, g: Fn<unknown, R>) =>
+  (ta: Task<A>): Task<R> =>
+  () =>
+    ta().then(f).catch(g);
+
 interface MTask<F extends URIS> extends Monad<F>, Applicative<F>, Delayable<F> {}
 
 export const T: MTask<URI> = { URI, of, map, join, chain, apply, delay };
