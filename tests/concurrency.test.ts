@@ -2,12 +2,12 @@ import { describe, it, expect } from "vitest";
 import * as T from "@/task";
 import * as TE from "@/task-either";
 import * as E from "@/either";
-import { concurrency, concurrency2 } from "@/utils";
+import { concurrencyT, concurrency2 } from "@/utils";
 import { pipe } from "@/pipe";
 
 describe("Concurrency", () => {
   it.concurrent("should be able to run two tasks concurrently", async () => {
-    const concurrently = concurrency(T)({ concurrency: 2, delay: 1000 });
+    const concurrently = concurrencyT(T)({ concurrency: 2, delay: 1000 });
 
     const log = (value: number) => console.log(`Concurrently value: ${value}`);
 

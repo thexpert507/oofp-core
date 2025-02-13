@@ -16,7 +16,7 @@ type VOK<F extends URIS2, Args extends Kind2<F, any, any>[]> = {
 
 type ArgsType<F extends URIS2, E> = [Kind2<F, E, any>, ...Kind2<F, E, any>[]];
 
-type Config = { concurrency: number; delay?: number };
+type Config = { concurrency?: number; delay?: number };
 
 const reduceFn =
   <F extends URIS2>(mo: Instance<F>) =>
@@ -30,18 +30,19 @@ const reduceFn =
 
 export const concurrency2 =
   <F extends URIS2>(mo: Instance<F>) =>
-  (config: Config) =>
+  (config?: Config) =>
   <E, Args extends Kind2<F, E, any>[] | ArgsType<F, E>>(
     args: Args,
     acc = mo.of<E, VOK<F, Args>>([] as any)
   ): Kind2<F, E, VOK<F, Args>> => {
     if (L.isEmpty(args)) return acc;
-    const portion = args.slice(0, config.concurrency) as Args;
-    const rest = args.slice(config.concurrency) as Args;
+    const concurrencyNumber = config?.concurrency ?? args.length;
+    const portion = args.slice(0, concurrencyNumber) as Args;
+    const rest = args.slice(concurrencyNumber) as Args;
 
     const newAcc = pipe(
       acc,
-      config.delay ? mo.delay(config.delay) : id,
+      config?.delay ? mo.delay(config.delay) : id,
       mo.chain((values) => pipe(portion, L.reduce(mo.of(values), reduceFn(mo))))
     );
 

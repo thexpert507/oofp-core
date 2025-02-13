@@ -96,7 +96,7 @@ describe("TaskEither", () => {
     const t2 = TE.of(2);
     const t3 = TE.of(3);
 
-    const result = await TE.run(TE.concurrent([t1, t2, t3]));
+    const result = await TE.run(TE.concurrency()([t1, t2, t3]));
 
     expect(result).toEqual(E.right([1, 2, 3]));
   });

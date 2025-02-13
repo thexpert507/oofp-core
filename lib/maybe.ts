@@ -44,6 +44,13 @@ export const iif =
     return condition(value.value) ? value : Nothing;
   };
 
+export const iifNot =
+  <T>(condition: Fn<T, boolean>) =>
+  (value: Maybe<T>): Maybe<T> => {
+    if (isNothing(value)) return value;
+    return !condition(value.value) ? value : Nothing;
+  };
+
 export const map =
   <T, U>(fn: (value: T) => U) =>
   (mo: Maybe<T>): Maybe<U> =>
