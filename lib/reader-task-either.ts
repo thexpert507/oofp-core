@@ -26,6 +26,11 @@ export const from =
   () =>
     te;
 
+export const fromReader =
+  <R, A>(r: R.Reader<R, A>): ReaderTaskEither<R, never, A> =>
+  (ctx: R) =>
+    TE.of(r(ctx));
+
 export const ask =
   <R>(): ReaderTaskEither<R, never, R> =>
   (ctx: R) =>
