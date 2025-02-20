@@ -266,7 +266,7 @@ export const retry =
         if (options.skipIf && options.skipIf(e)) return left(e);
         if (acc >= options.maxRetries) return left(e);
         if (options.onError) options.onError(e);
-        return pipe(ta, options.delay ? delay(options.delay) : id, retry(options, acc + 1));
+        return pipe(ta, options.delay ? delay(options.delay) : id(), retry(options, acc + 1));
       })
     );
   };

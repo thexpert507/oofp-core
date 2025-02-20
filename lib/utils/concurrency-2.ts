@@ -42,7 +42,7 @@ export const concurrency2 =
 
     const newAcc = pipe(
       acc,
-      config?.delay ? mo.delay(config.delay) : id,
+      config?.delay ? mo.delay(config.delay) : id(),
       mo.chain((values) => pipe(portion, L.reduce(mo.of(values), reduceFn(mo))))
     );
 

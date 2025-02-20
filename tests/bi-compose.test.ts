@@ -16,8 +16,8 @@ describe("bi-compose", () => {
   it("should handle left side composition", async () => {
     const composed = compose(
       BI.bimap(toUpper, double),
-      BI.bimap(length, id),
-      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+      BI.bimap(length, id()),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>()
     );
 
     const result = composed(E.left(Promise.resolve([1])));
@@ -31,8 +31,8 @@ describe("bi-compose", () => {
   it("should handle right side composition", () => {
     const composed = compose(
       BI.bimap(toUpper, double),
-      BI.bimap(length, id),
-      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+      BI.bimap(length, id()),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>()
     );
 
     const result = composed(E.right(M.just(2)));
@@ -44,8 +44,8 @@ describe("bi-compose", () => {
   it("should handle nested composition", async () => {
     const composed = compose(
       BI.bimap(toUpper, double),
-      BI.bimap(length, id),
-      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+      BI.bimap(length, id()),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>()
     );
 
     const result = composed(E.left(Promise.resolve([1, 2, 3])));
@@ -59,8 +59,8 @@ describe("bi-compose", () => {
   it("should handle empty maybe", () => {
     const composed = compose(
       BI.bimap(toUpper, double),
-      BI.bimap(length, id),
-      id<E.Either<Promise<number[]>, M.Maybe<number>>>
+      BI.bimap(length, id()),
+      id<E.Either<Promise<number[]>, M.Maybe<number>>>()
     );
 
     const result = composed(E.right(M.nothing()));

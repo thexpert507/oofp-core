@@ -33,7 +33,7 @@ describe("MaybeT", () => {
     const MT = maybeT(P);
     const value = "Hello, World!";
     const toUpperCase = (value: string) => value.toUpperCase();
-    const composed = compose(MT.map(toUpperCase), MT.lift, id<Promise<string>>);
+    const composed = compose(MT.map(toUpperCase), MT.lift, id<Promise<string>>());
     const result = await composed(Promise.resolve(value));
     expect(result).toEqual(M.of(value.toUpperCase()));
   });
