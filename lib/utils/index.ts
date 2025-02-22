@@ -1,6 +1,7 @@
 export * from "./base";
 export * from "./concurrency-2";
 export * from "./concurrency";
+export * from "./group-index";
 export * from "./isEmpty";
 export * from "./sequence-object";
 export * from "./sequence-object2";

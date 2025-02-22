@@ -1,10 +1,16 @@
 import { Fn } from "./function.ts";
 import { Functor } from "./functor.ts";
+import * as U from "./utils";
 
 export const map =
   <A, B>(fn: Fn<A, B>) =>
   (list: A[]): B[] =>
     list.map(fn);
+
+export const mapIndexed =
+  <A, B>(fn: Fn<number, Fn<A, B>>) =>
+  (list: A[]): B[] =>
+    list.map((item, index) => fn(index)(item));
 
 export const filter =
   <A>(fn: Fn<A, boolean>) =>
@@ -34,5 +40,15 @@ export const chunk =
     }
     return result;
   };
+
+export const groupBy =
+  <A>(fn: Fn<A, string>) =>
+  (list: A[]): Record<string, A[]> =>
+    U.groupBy(fn)(list);
+
+export const indexBy =
+  <A>(fn: Fn<A, string>) =>
+  (list: A[]): Record<string, A> =>
+    U.indexBy(fn)(list);
 
 export const L = { map } satisfies Functor<"Array">;
