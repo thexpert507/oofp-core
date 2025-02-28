@@ -13,3 +13,10 @@ export const mapKeyValues =
       const result = fn(key)(value);
       return { ...prev, [key]: result };
     }, {} as Record<K, R>);
+
+export const values = <K extends string, V>(obj: Record<K, V>): V[] => Object.values(obj);
+export const keys = <K extends string, V>(obj: Record<K, V>): K[] => Object.keys(obj) as K[];
+export const entries = <K extends string, V>(obj: Record<K, V>): [K, V][] =>
+  Object.entries(obj) as [K, V][];
+export const fromEntries = <K extends string, V>(entries: [K, V][]): Record<K, V> =>
+  Object.fromEntries(entries) as Record<K, V>;
