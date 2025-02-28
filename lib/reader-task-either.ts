@@ -4,6 +4,8 @@ import * as R from "./reader";
 import { Task } from "./task";
 import * as TE from "./task-either";
 import * as O from "./object";
+import { Applicative3 } from "./applicative";
+import { Monad3 } from "./monad";
 
 export const URI = "ReaderTaskEither";
 export type URI = typeof URI;
@@ -92,6 +94,16 @@ export const mapLeft =
     return (ctx: R) => pipe(rte(ctx), TE.mapLeft(fn));
   };
 
+export const join = <R, E, A>(
+  rte: ReaderTaskEither<R, E, ReaderTaskEither<R, E, A>>
+): ReaderTaskEither<R, E, A> => {
+  return (ctx: R) =>
+    pipe(
+      rte(ctx),
+      TE.chain((rte) => rte(ctx))
+    );
+};
+
 export const chain =
   <R, E, A, B>(fn: Fn<A, ReaderTaskEither<R, E, B>>) =>
   (rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, B> => {
@@ -146,35 +158,64 @@ export const run =
     rte(r);
 
 export const apply =
-  <R, E, A>(rte: ReaderTaskEither<R, E, A>) =>
-  <B>(rtfn: ReaderTaskEither<R, E, Fn<A, B>>): ReaderTaskEither<R, E, B> => {
-    return (ctx: R) =>
-      pipe(
-        rte(ctx),
-        TE.chain((a) =>
-          pipe(
-            rtfn(ctx),
-            TE.map((fn) => fn(a))
-          )
-        )
-      );
+  <R, E, A, B>(rtefn: ReaderTaskEither<R, E, Fn<A, B>>) =>
+  (rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, B> => {
+    return (ctx: R) => pipe(rte(ctx), TE.apply(rtefn(ctx)));
   };
 
-export const sequence = <R, E, A>(
-  arr: ReaderTaskEither<R, E, A>[]
-): ReaderTaskEither<R, E, A[]> => {
-  return (ctx: R) => TE.sequence(arr.map((rte) => rte(ctx)));
+// Helper types for the new sequenceObject and sequence
+type ReaderContexts<T extends ReaderTaskEither<any, any, any>[]> = UnionToIntersection<
+  {
+    [K in keyof T]: T[K] extends ReaderTaskEither<infer R, any, any> ? R : never;
+  }[keyof T & number]
+>;
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
+  ? I
+  : never;
+
+type ReaderErrors<T extends ReaderTaskEither<any, any, any>[]> = {
+  [K in keyof T & number]: T[K] extends ReaderTaskEither<any, infer E, any> ? E : never;
+}[keyof T & number];
+
+type ReaderValues<T extends ReaderTaskEither<any, any, any>[]> = {
+  [K in keyof T & number]: T[K] extends ReaderTaskEither<any, any, infer A> ? A : never;
 };
 
-export const sequenceObject = <K extends string, R, E, A>(
-  obj: Record<K, ReaderTaskEither<R, E, A>>
-): ReaderTaskEither<R, E, Record<K, A>> => {
-  return (ctx: R) => {
+export const sequence = <T extends ReaderTaskEither<any, any, any>[]>(
+  arr: T
+): ReaderTaskEither<ReaderContexts<T>, ReaderErrors<T>, ReaderValues<T>> => {
+  return (ctx: ReaderContexts<T>) => {
+    const taskEitherArr = arr.map((rte) => rte(ctx));
+    return pipe(taskEitherArr, TE.sequence) as TE.TaskEither<ReaderErrors<T>, ReaderValues<T>>;
+  };
+};
+
+// Helper types for the new sequenceObject
+type ReaderObjectContexts<T extends Record<string, ReaderTaskEither<any, any, any>>> =
+  UnionToIntersection<
+    {
+      [K in keyof T]: T[K] extends ReaderTaskEither<infer R, any, any> ? R : never;
+    }[keyof T]
+  >;
+
+type ReaderObjectErrors<T extends Record<string, ReaderTaskEither<any, any, any>>> = {
+  [K in keyof T]: T[K] extends ReaderTaskEither<any, infer E, any> ? E : never;
+}[keyof T];
+
+type ReaderObjectValues<T extends Record<string, ReaderTaskEither<any, any, any>>> = {
+  [K in keyof T]: T[K] extends ReaderTaskEither<any, any, infer A> ? A : never;
+};
+
+export const sequenceObject = <T extends Record<string, ReaderTaskEither<any, any, any>>>(
+  obj: T
+): ReaderTaskEither<ReaderObjectContexts<T>, ReaderObjectErrors<T>, ReaderObjectValues<T>> => {
+  return (ctx: ReaderObjectContexts<T>) => {
     return pipe(
       obj,
       O.mapValues((rte) => rte(ctx)),
       TE.sequenceObject,
-      (d) => d as TE.TaskEither<E, Record<K, A>>
+      (d) => d as TE.TaskEither<ReaderObjectErrors<T>, ReaderObjectValues<T>>
     );
   };
 };
@@ -191,3 +232,7 @@ export const delay =
   <R, E, A>(rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, A> => {
     return (ctx: R) => pipe(rte(ctx), TE.delay(ms));
   };
+
+interface RTEF extends Monad3<URI>, Applicative3<URI> {}
+
+export const RTE: RTEF = { URI, of, map, join, chain, apply };

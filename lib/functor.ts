@@ -1,6 +1,7 @@
 import { Kind2, URIS2 } from "@/URIS2";
 import { Fn } from "./function.ts";
 import { Kind, URIS } from "./URIS.ts";
+import { Kind3, URIS3 } from "./URIS3.ts";
 
 export interface Functor<F extends URIS> {
   map: <A, B>(f: Fn<A, B>) => (as: Kind<F, A>) => Kind<F, B>;
@@ -8,6 +9,10 @@ export interface Functor<F extends URIS> {
 
 export interface Functor2<F extends URIS2> {
   map: <A, B>(f: Fn<A, B>) => <E>(as: Kind2<F, E, A>) => Kind2<F, E, B>;
+}
+
+export interface Functor3<F extends URIS3> {
+  map: <R, E, A, B>(f: Fn<A, B>) => (as: Kind3<F, R, E, A>) => Kind3<F, R, E, B>;
 }
 
 export interface BiFunctor2<F extends URIS2> extends Functor2<F> {
