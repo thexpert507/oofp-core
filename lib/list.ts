@@ -51,4 +51,24 @@ export const indexBy =
   (list: A[]): Record<string, A> =>
     U.indexBy(fn)(list);
 
+export const sort =
+  <A>(fn: Fn<{ a: A; b: A }, number>) =>
+  (list: A[]): A[] =>
+    list.sort((a, b) => fn({ a, b }));
+
+export const concat =
+  <A>(list1: A[]) =>
+  (list2: A[]): A[] =>
+    list1.concat(list2);
+
+export const append =
+  <A>(item: A) =>
+  (list: A[]): A[] =>
+    list.concat(item);
+
+export const prepend =
+  <A>(item: A) =>
+  (list: A[]): A[] =>
+    [item].concat(list);
+
 export const L = { map } satisfies Functor<"Array">;

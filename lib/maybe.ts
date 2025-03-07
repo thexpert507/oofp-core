@@ -1,7 +1,7 @@
 import { Monad } from "@/monad.ts";
-import { match } from "ts-pattern";
-import { Fn } from "./function";
+import { Fn, Fn2 } from "./function";
 import { Applicative } from "./applicative";
+import { sequenceObjectT, sequenceT } from "./utils";
 
 export const URI = "Maybe";
 export type URI = typeof URI;
@@ -22,15 +22,12 @@ export const nothing = <T>(): Maybe<T> => Nothing;
 export const fromNullable = <T>(value: T | null | undefined): Maybe<T> =>
   value === null || value === undefined ? Nothing : just(value);
 
-export const of = <T>(value: T | null | undefined): Maybe<T> =>
-  match(value)
-    .with(null, () => nothing<T>())
-    .otherwise((value) => just<T>(value));
+export const of = <T>(value: T | null | undefined): Maybe<T> => {
+  return value === null || value === undefined ? Nothing : just(value);
+};
 
 export const isNothing = <T>(value: Maybe<T>): value is { kind: "Nothing" } =>
-  match(value)
-    .with(Nothing, () => true)
-    .otherwise(() => false);
+  value.kind === Nothing.kind;
 
 export const isJust = <T>(value: Maybe<T>): value is { kind: "Just"; value: T } =>
   !isNothing(value);
@@ -102,6 +99,15 @@ export const apply =
   (mo: Maybe<T>): Maybe<U> =>
     isNothing(fn) || isNothing(mo) ? Nothing : just(fn.value(mo.value));
 
+export const liftA2 =
+  <T, U, V>(fn: Fn2<T, U, V>) =>
+  (mo1: Maybe<T>) =>
+  (mo2: Maybe<U>): Maybe<V> =>
+    apply(map(fn)(mo1))(mo2);
+
 interface MF extends Monad<URI>, Applicative<URI> {}
 
 export const M: MF = { URI, map, chain, of, join, apply };
+
+export const sequence = sequenceT(M);
+export const sequenceObject = sequenceObjectT(M);

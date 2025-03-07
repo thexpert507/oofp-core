@@ -38,6 +38,15 @@ export const chain =
   (s: S) =>
     pipe(as(s), ([a, s]) => fn(a)(s));
 
+export const chainFirst =
+  <S, A>(fn: Fn<A, State<S, unknown>>) =>
+  (as: State<S, A>): State<S, A> =>
+  (s: S) => {
+    const [a, s1] = as(s);
+    const [_, s2] = fn(a)(s1);
+    return [a, s2];
+  };
+
 export const apply =
   <S, A, B>(fs: State<S, Fn<A, B>>) =>
   (as: State<S, A>): State<S, B> =>

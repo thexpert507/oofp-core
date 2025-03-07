@@ -42,6 +42,11 @@
       "import": "./dist/es/either.js",
       "require": "./dist/cjs/either.cjs"
     },
+    "./flow": {
+      "types": "./dist/flow.d.ts",
+      "import": "./dist/es/flow.js",
+      "require": "./dist/cjs/flow.cjs"
+    },
     "./function": {
       "types": "./dist/function.d.ts"
     },
@@ -147,8 +152,5 @@
     "vite": "^6.0.1",
     "vite-plugin-dts": "^4.3.0",
     "vitest": "^2.1.6"
-  },
-  "dependencies": {
-    "ts-pattern": "^5.5.0"
   }
 }

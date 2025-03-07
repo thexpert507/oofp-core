@@ -16,6 +16,7 @@ export default defineConfig({
         compose: resolve(__dirname, "lib/compose.ts"),
         curry: resolve(__dirname, "lib/curry.ts"),
         either: resolve(__dirname, "lib/either.ts"),
+        flow: resolve(__dirname, "lib/flow.ts"),
         id: resolve(__dirname, "lib/id.ts"),
         list: resolve(__dirname, "lib/list.ts"),
         maybe: resolve(__dirname, "lib/maybe.ts"),

@@ -33,6 +33,10 @@ export const apply =
 
 export const isPromise = <A>(value: unknown): value is Promise<A> => value instanceof Promise;
 
+export const reject = <A>(error: unknown): Promise<A> => Promise.reject(error);
+
+export const resolve = <A>(value: A): Promise<A> => Promise.resolve(value);
+
 interface PF extends Monad<URI>, Applicative<URI> {}
 
 export const P: PF = { URI, map, join, of, chain, apply };

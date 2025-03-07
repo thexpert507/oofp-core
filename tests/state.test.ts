@@ -1,5 +1,7 @@
 import { describe, test, expect } from "vitest";
 import * as S from "@/state";
+import * as M from "@/maybe";
+import { pipe } from "@/pipe";
 
 describe("State", () => {
   test("of", () => {
@@ -30,5 +32,11 @@ describe("State", () => {
     const state = S.join(S.of(S.of(1)));
     const result = state(0);
     expect(result).toEqual([1, 0]);
+  });
+
+  test("Whith maybe", () => {
+    type MyState = { count: number };
+
+    // pipe(S.of(M.just(1)));
   });
 });

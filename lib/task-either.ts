@@ -5,7 +5,7 @@ import * as E from "./either";
 import { Monad2 } from "./monad";
 import { compose } from "./compose";
 import { Fn } from "./function";
-import { P } from "./promise";
+import * as P from "./promise";
 import { pipe } from "./pipe";
 import { BiFunctor2 } from "./functor";
 import { Delayable2 } from "./delayable";
@@ -196,6 +196,16 @@ export const toUnion = compose(T.map(E.toUnion));
 export const toNullable = compose(T.map(E.toNullable));
 
 export const toMaybe = compose(T.map(E.toMaybe));
+
+export const toTask = <E, A>(tea: TaskEither<E, A>): Task<A> => {
+  return () =>
+    tea().then(
+      E.fold(
+        (e) => P.reject(e),
+        (a) => P.resolve(a)
+      )
+    );
+};
 
 export const toPromise = <E, A>(tea: TaskEither<E, A>): Promise<A> => {
   return tea().then(
