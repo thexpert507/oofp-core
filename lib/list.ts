@@ -1,8 +1,6 @@
 import { Fn } from "./function.ts";
 import { Functor } from "./functor.ts";
 import * as U from "./utils";
-import * as M from "./maybe";
-import { pipe } from "./pipe.ts";
 
 export const map =
   <A, B>(fn: Fn<A, B>) =>
@@ -75,7 +73,7 @@ export const prepend =
 
 export const find =
   <A>(fn: Fn<A, boolean>) =>
-  (list: A[]): M.Maybe<A> =>
-    pipe(list.find(fn), M.fromNullable);
+  (list: A[]): A | undefined =>
+    list.find(fn);
 
 export const L = { map } satisfies Functor<"Array">;
