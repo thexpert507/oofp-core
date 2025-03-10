@@ -158,9 +158,9 @@ export const run =
     rte(r);
 
 export const apply =
-  <R, E, A, B>(rtefn: ReaderTaskEither<R, E, Fn<A, B>>) =>
-  (rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, B> => {
-    return (ctx: R) => pipe(rte(ctx), TE.apply(rtefn(ctx)));
+  <R2, E, A, B>(rtefn: ReaderTaskEither<R2, E, Fn<A, B>>) =>
+  <R1>(rte: ReaderTaskEither<R1, E, A>): ReaderTaskEither<R1 & R2, E, B> => {
+    return (ctx: R1 & R2) => pipe(rte(ctx), TE.apply(rtefn(ctx)));
   };
 
 // Helper types for the new sequenceObject and sequence
