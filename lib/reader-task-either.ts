@@ -114,6 +114,16 @@ export const chain =
       );
   };
 
+export const chainLeft =
+  <R, E, A>(fn: Fn<E, ReaderTaskEither<R, E, A>>) =>
+  (rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, A> => {
+    return (ctx: R) =>
+      pipe(
+        rte(ctx),
+        TE.chainLeft((e) => fn(e)(ctx))
+      );
+  };
+
 export const chaint =
   <E, A, B>(fn: Fn<A, TE.TaskEither<E, B>>) =>
   <R>(rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, B> => {

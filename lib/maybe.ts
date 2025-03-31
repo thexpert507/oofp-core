@@ -61,9 +61,9 @@ export const chain =
 export const join = <T>(mo: Maybe<Maybe<T>>): Maybe<T> => (isNothing(mo) ? Nothing : mo.value);
 
 export const chainNothing =
-  <T, U>(fn: () => Maybe<U>) =>
-  (mo: Maybe<T>): Maybe<U> =>
-    isNothing(mo) ? fn() : Nothing;
+  <T>(fn: () => Maybe<T>) =>
+  (mo: Maybe<T>): Maybe<T> =>
+    isNothing(mo) ? fn() : mo;
 
 export const tap =
   <T>(fn: (value: T) => void) =>
