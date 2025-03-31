@@ -38,7 +38,7 @@ export const isEmpty = <A>(list: A[]): boolean => list.length === 0;
 
 export const flatten = <A>(list: A[][]): A[] => list.flat();
 
-export const unique =
+export const distinctBy =
   <A, B = A>(fn?: Fn<A, B>) =>
   (list: A[]): A[] => {
     if (!fn) return [...new Set(list)];
