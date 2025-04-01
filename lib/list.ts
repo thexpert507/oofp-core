@@ -104,6 +104,15 @@ export const find =
   (list: A[]): A | undefined =>
     list.find(fn);
 
+export const findMap =
+  <A, B>(fn: Fn<A, B | undefined>) =>
+  (list: A[]): B | undefined => {
+    for (const item of list) {
+      const result = fn(item);
+      if (result !== undefined) return result;
+    }
+  };
+
 export const join =
   (separator: string) =>
   <A>(list: A[]): string =>
