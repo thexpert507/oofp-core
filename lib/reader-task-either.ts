@@ -230,9 +230,9 @@ export const sequenceObject = <T extends Record<string, ReaderTaskEither<any, an
   };
 };
 
-type Config = { concurrency: number; delay?: number };
+type Config = { concurrency?: number; delay?: number };
 export const concurrency =
-  (config: Config) =>
+  (config?: Config) =>
   <R, E, A>(arr: ReaderTaskEither<R, E, A>[]): ReaderTaskEither<R, E, A[]> => {
     return (ctx: R) => TE.concurrency(config)(arr.map((rte) => rte(ctx)));
   };
