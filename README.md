@@ -182,6 +182,110 @@ const config: Config = { apiUrl: "https://api.example.com", timeout: 5000 };
 const getData = R.run(config)(fetchData("users"));
 ```
 
+### ReaderTaskEither - Inyección de dependencias + Asíncrono + Manejo de errores
+
+`ReaderTaskEither` combina los tres conceptos más importantes de la programación funcional: inyección de dependencias (`Reader`), computaciones asíncronas (`Task`) y manejo de errores (`Either`). Es ideal para aplicaciones reales.
+
+```typescript
+import * as RTE from '@oofp/core/reader-task-either';
+import * as E from '@oofp/core/either';
+import { pipe } from '@oofp/core/pipe';
+
+interface AppContext {
+  db: Database;
+  logger: Logger;
+  config: AppConfig;
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+// Operaciones que necesitan contexto, son asíncronas y pueden fallar
+const findUser = (id: number): RTE.ReaderTaskEither<AppContext, string, User> =>
+  ({ db, logger }) => async () => {
+    try {
+      logger.info(`Buscando usuario ${id}`);
+      const user = await db.users.findById(id);
+      return user ? E.right(user) : E.left('Usuario no encontrado');
+    } catch (error) {
+      return E.left(`Error de base de datos: ${error.message}`);
+    }
+  };
+
+const updateUser = (id: number, data: Partial<User>): RTE.ReaderTaskEither<AppContext, string, User> =>
+  ({ db, logger }) => async () => {
+    try {
+      logger.info(`Actualizando usuario ${id}`);
+      const updated = await db.users.update(id, data);
+      return E.right(updated);
+    } catch (error) {
+      return E.left(`Error al actualizar: ${error.message}`);
+    }
+  };
+
+// Componer operaciones complejas
+const promoteUser = (id: number) => pipe(
+  findUser(id),
+  RTE.chain(user => 
+    updateUser(id, { ...user, role: 'admin' })
+  ),
+  RTE.map(user => ({ ...user, promoted: true }))
+);
+
+// Usar con contexto
+const context: AppContext = {
+  db: new Database(),
+  logger: new Logger(),
+  config: new AppConfig()
+};
+
+// Ejecutar la operación
+RTE.run(context)(promoteUser(123))
+  .then(result => {
+    if (E.isRight(result)) {
+      console.log('Usuario promovido:', result.right);
+    } else {
+      console.error('Error:', result.left);
+    }
+  });
+```
+
+#### Operaciones avanzadas con ReaderTaskEither
+
+```typescript
+// Secuenciar múltiples operaciones
+const processMultipleUsers = (ids: number[]) => pipe(
+  ids.map(findUser),
+  RTE.sequence
+);
+
+// Inyección parcial de dependencias
+const withDatabase = RTE.provide({ db: new Database() });
+
+const userOperation = pipe(
+  findUser(1),
+  withDatabase
+); // Ahora solo necesita { logger, config }
+
+// Manejo de contextos combinados
+const enrichUser = (id: number) => pipe(
+  findUser(id),
+  RTE.chainwc(user => 
+    // Esta operación necesita un contexto diferente
+    fetchUserPermissions(user.id) // ReaderTaskEither<PermissionContext, string, Permission[]>
+  )
+);
+
+// Operaciones en paralelo con límite de concurrencia
+const processUsersInBatches = (ids: number[]) => pipe(
+  ids.map(findUser),
+  RTE.concurrency({ concurrency: 3 })
+);
+```
+
 ### Curry - Funciones currificadas
 
 ```typescript
@@ -281,6 +385,7 @@ import * as Either from '@oofp/core/either';
 import * as Task from '@oofp/core/task';
 import * as TaskEither from '@oofp/core/task-either';
 import * as Reader from '@oofp/core/reader';
+import * as ReaderTaskEither from '@oofp/core/reader-task-either';
 import * as State from '@oofp/core/state';
 
 // Utilidades de composición
@@ -334,6 +439,62 @@ const processUsers = (users: User[]) => pipe(
   L.groupBy(user => user.department),
   L.map(group => ({ ...group, count: group.length }))
 );
+```
+
+### Aplicación completa con ReaderTaskEither
+
+```typescript
+import * as RTE from '@oofp/core/reader-task-either';
+import * as E from '@oofp/core/either';
+import { pipe } from '@oofp/core/pipe';
+
+// Contexto de la aplicación
+interface AppContext {
+  database: Database;
+  emailService: EmailService;
+  logger: Logger;
+}
+
+// Operaciones de negocio completas
+const registerUser = (userData: UserInput) => pipe(
+  validateUser(userData),
+  RTE.chain(data => createUser(data)),
+  RTE.chain(user => sendWelcomeEmail(user.email)),
+  RTE.tapRTE(user => logUserCreation(user.id)),
+  RTE.mapLeft(error => `Registration failed: ${error}`)
+);
+
+const validateUser = (data: UserInput): RTE.ReaderTaskEither<AppContext, string, ValidUser> =>
+  RTE.of(data); // Aquí iría la lógica de validación
+
+const createUser = (data: ValidUser): RTE.ReaderTaskEither<AppContext, string, User> =>
+  ({ database }) => () => database.createUser(data);
+
+const sendWelcomeEmail = (email: string): RTE.ReaderTaskEither<AppContext, string, void> =>
+  ({ emailService }) => () => emailService.sendWelcome(email);
+
+const logUserCreation = (userId: number): RTE.ReaderTaskEither<AppContext, string, void> =>
+  ({ logger }) => () => {
+    logger.info(`User created: ${userId}`);
+    return Promise.resolve(E.right(undefined));
+  };
+
+// Uso en el controlador
+const handleRegistration = async (req: Request, res: Response) => {
+  const context: AppContext = {
+    database: req.app.db,
+    emailService: req.app.emailService,
+    logger: req.app.logger
+  };
+
+  const result = await RTE.run(context)(registerUser(req.body));
+  
+  if (E.isRight(result)) {
+    res.json({ success: true, user: result.right });
+  } else {
+    res.status(400).json({ error: result.left });
+  }
+};
 ```
 
 ## 🤝 Contribución
