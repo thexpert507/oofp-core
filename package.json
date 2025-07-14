@@ -58,6 +58,11 @@
       "import": "./dist/es/id.js",
       "require": "./dist/cjs/id.cjs"
     },
+    "./io": {
+      "types": "./dist/io.d.ts",
+      "import": "./dist/es/io.js",
+      "require": "./dist/cjs/io.cjs"
+    },
     "./join": {
       "types": "./dist/join.d.ts"
     },
