@@ -87,10 +87,7 @@ export const tapRTEAsync =
 	};
 
 export const tapRTEDetached =
-	<R2, E2, A>(
-		fn: Fn<A, ReaderTaskEither<R2, E2, void>>,
-		onError?: Fn<E2, void>
-	) =>
+	<R2, E2, A>(fn: Fn<A, ReaderTaskEither<R2, E2, void>>, onError?: Fn<E2, void>) =>
 	<R1, E1>(rte: ReaderTaskEither<R1, E1, A>): ReaderTaskEither<R1 & R2, E1, A> => {
 		return (ctx: R1 & R2) =>
 			pipe(
@@ -110,10 +107,7 @@ export const tapLeftRTEAsync =
 	};
 
 export const tapLeftRTEDetached =
-	<R2, E1, E2, A>(
-		fn: Fn<E1, ReaderTaskEither<R2, E2, void>>,
-		onError?: Fn<E2, void>
-	) =>
+	<R2, E1, E2, A>(fn: Fn<E1, ReaderTaskEither<R2, E2, void>>, onError?: Fn<E2, void>) =>
 	<R1>(rte: ReaderTaskEither<R1, E1, A>): ReaderTaskEither<R1 & R2, E1, A> => {
 		return (ctx: R1 & R2) =>
 			pipe(
@@ -196,12 +190,22 @@ export const chainwc =
 			);
 	};
 
+export const chainLeftwc =
+	<R2, E, A>(fn: Fn<E, ReaderTaskEither<R2, E, A>>) =>
+	<R1>(rte: ReaderTaskEither<R1, E, A>): ReaderTaskEither<R1 & R2, E, A> => {
+		return (ctx: R1 & R2) =>
+			pipe(
+				rte(ctx),
+				TE.chainLeft((e) => fn(e)(ctx)),
+			);
+	};
+
 export const provide =
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	<R extends Record<any, any>, R2 extends Partial<R>>(r2: R2) =>
-	<E, A>(ra: ReaderTaskEither<R, E, A>): ReaderTaskEither<Omit<R, keyof R2>, E, A> =>
-	(r: Omit<R, keyof R2>) =>
-		ra({ ...r2, ...r } as unknown as R);
+		<R extends Record<any, any>, R2 extends Partial<R>>(r2: R2) =>
+		<E, A>(ra: ReaderTaskEither<R, E, A>): ReaderTaskEither<Omit<R, keyof R2>, E, A> =>
+		(r: Omit<R, keyof R2>) =>
+			ra({ ...r2, ...r } as unknown as R);
 
 export const fold =
 	<R, E, A, B>(onLeft: Fn<E, B>, onRight: Fn<A, B>) =>
