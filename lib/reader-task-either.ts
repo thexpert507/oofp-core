@@ -165,9 +165,9 @@ export const chainLeft =
 	};
 
 export const chaint =
-	<E, A, B>(fn: Fn<A, TE.TaskEither<E, B>>) =>
-	<R>(rte: ReaderTaskEither<R, E, A>): ReaderTaskEither<R, E, B> => {
-		return (ctx: R) => pipe(rte(ctx), TE.chain(fn));
+	<E1, A, B>(fn: Fn<A, TE.TaskEither<E1, B>>) =>
+	<R, E2>(rte: ReaderTaskEither<R, E2, A>): ReaderTaskEither<R, E1 | E2, B> => {
+		return (ctx: R) => pipe(rte(ctx), TE.chainw(fn));
 	};
 
 export const chainw =
